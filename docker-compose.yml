@@ -1,14 +1,13 @@
 version: "3.8"
 services:
-    app:
-      build: 
-        context: ./
-        dockerfile: DevDockerfile
-      container_name: motonreel_app
-      ports:
-        - '3000:3000'
-      volumes:
-        - .:/app
+  client:
+    build: ./client
+    container_name: motonreel_client
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./client:/app
+      - /app/node_modules
 
 
   

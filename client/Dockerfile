@@ -1,13 +1,13 @@
 FROM node:18-alpine
 
-EXPOSE 3000
-
 WORKDIR /app
 
 COPY package.json .
 
 RUN npm install
 
-COPY . .
+RUN chown 1000:1000 node_modules
+
+EXPOSE 3000
 
 CMD npm run dev
