@@ -2,9 +2,10 @@
   "name": "motonreel",
   "private": true,
   "version": "0.0.0",
+  "license": "MIT",
   "type": "module",
   "scripts": {
-    "dev": "vite --host --port 3000",
+    "start": "vite --host --port 3000",
     "build": "vite build",
     "preview": "vite preview"
   },
