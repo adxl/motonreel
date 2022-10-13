@@ -1,15 +1,11 @@
 # Motoenreel
 
-### How to launch the project (dev)
+## How to launch the project
 
-1 - `$ docker-compose build --pull --no-cache`  
-2 - `$ docker-compose up -d`
+1 - `$ ./install.sh`  
+2 - `$ docker-compose build --pull --no-cache`  
+3 - `$ docker-compose up -d`  
 
-3 - `http://localhost:3000`
+4.1 - Client : `http://localhost:3000`  
+4.2 - Server : `http://localhost:9000`  
 
-### How to launch the project (build)
-
-1 - `$ docker build -t motonreel:latest .`  
-2 - `$ docker run -p 3000:3000 motonreel:latest`
-
-3 - `http://localhost:3000`
