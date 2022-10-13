@@ -5,6 +5,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 RUN npm ci
+RUN chown -R node:node node_modules
 
 USER node
 

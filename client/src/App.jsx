@@ -1,7 +1,11 @@
 import reactLogo from './assets/react.svg'
 import './App.css'
+import {useEffect} from 'react'
 
 function App() {
+  useEffect(() => {
+    fetch('http://localhost:9000').then(res=>res.json()).then(data=>{debugger})
+  }, [])
   return (
     <div className="App">
       <div>
