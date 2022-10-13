@@ -6,8 +6,15 @@ services:
     ports:
       - '3000:3000'
     volumes:
-      - ./client:/app
-      - /app/node_modules
-
-
+      - ./client:/usr/src/app
+      - /usr/src/app/node_modules
   
+  server:
+    build: ./server
+    container_name: motonreel_server
+    ports:
+      - '9000:9000'
+    volumes:
+      - ./server:/usr/src/app
+      - /usr/src/app/node_modules
+
