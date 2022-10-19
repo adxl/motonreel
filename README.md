@@ -2,12 +2,22 @@
 
 ## How to launch the project
 
-1.1 - `$ cp ./client/.env.local ./client/.env`  
-1.1 - `$ cp ./server/.env.local ./server/.env`  
+1 - Create the environment
 
-2 - `$ docker-compose build --pull --no-cache`  
-3 - `$ docker-compose up -d`  
+- `$ cp ./client/.env.local ./client/.env`  
+- `$ cp ./server/.env.local ./server/.env`  
 
-4.1 - Client : `http://localhost:3000`  
-4.2 - Server : `http://localhost:9000`  
+2 - Start the containers
+
+- `$ docker-compose build --pull --no-cache`  
+- `$ docker-compose up -d`  
+
+3 - Run the migrations
+
+- `$ docker container exec motonreel_server node migrate.js`
+
+4 - Navigate to:
+
+- Client : `http://localhost:3000`  
+- Server : `http://localhost:9000`  
 

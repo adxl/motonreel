@@ -8,6 +8,7 @@ services:
     volumes:
       - ./client:/usr/src/app
     command: sh -c "npm install && npm run start"
+    env_file: ./client/.env 
   
   server:
     build: ./server
@@ -17,3 +18,21 @@ services:
     volumes:
       - ./server:/usr/src/app
     command: sh -c "npm install && npm run start"
+    env_file: ./server/.env 
+
+  db:
+    image: postgres:13-alpine
+    container_name: motonreel_db
+    environment:
+      POSTGRES_DB: motonreel_db
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+      TZ: Europe/Paris
+      PGTZ: Europe/Paris
+    volumes:
+      - motonreel-data:/var/lib/postgresql/data:rw
+    ports:
+      - "5432:5432"
+
+volumes:
+  motonreel-data: {}
