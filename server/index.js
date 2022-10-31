@@ -1,7 +1,9 @@
-require('dotenv').config();
+import { initDatabase, showTables } from './db/db.js';
+import dotenv from 'dotenv';
+import express from 'express';
+import cors from 'cors';
 
-const express = require('express');
-const cors = require('cors');
+const env = dotenv.config();
 
 const app = express();
 
@@ -17,4 +19,14 @@ app.get('/', (_, res) => {
 const { PORT } = process.env;
 app.listen(PORT, () => {
   console.log(`Running on http://0.0.0.0:${PORT}`);
+});
+
+app.get('/initDB', async function (_, res) {
+  await initDatabase();
+  res.status(200).json('Database initialized');
+});
+
+app.get('/showTables', async function (_, res) {
+  await showTables();
+  res.status(200).json('Tables shown');
 });
