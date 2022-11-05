@@ -14,7 +14,7 @@
 
 3 - Run the migrations
 
-- `$ docker container exec motonreel_server node migrate.js`
+- `$ docker container exec motonreel_server node migrate.js`  
 
 4 - Navigate to:
 
