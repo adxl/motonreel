@@ -1,6 +1,3 @@
-const { sequelize } = require('./models');
+const { initDatabase } = require('./db');
 
-sequelize.sync({ alter: true }).then(() => {
-  console.log('Database synced');
-  sequelize.close();
-});
+initDatabase();
