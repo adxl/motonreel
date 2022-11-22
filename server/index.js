@@ -27,11 +27,23 @@ app.get('/salons', salons.findAll);
 
 app.get('/salons/:id', salons.findOne);
 
-app.put('/salons/:id', salons.update);
+app.patch('/salons/:id', salons.update);
 
 app.delete('/salons/:id', salons.delete);
 
 /* User Routes */
+
+const users = require('./controllers/users.controller');
+
+app.post('/users/create', users.create);
+
+app.get('/users', users.findAll);
+
+app.get('/users/:id', users.findOne);
+
+app.patch('/users/:id', users.update);
+
+app.delete('/users/:id', users.delete);
 
 const { PORT } = process.env;
 app.listen(PORT, () => {

@@ -1,10 +1,8 @@
 const db = require('../db').db;
-
 const Salon = db.salon;
 
 exports.create = async (req, res) => {
-  const name = req.body.name;
-  const userSize = req.body.userSize;
+  const { name, userSize } = req.body;
 
   if (!name || !userSize) {
     return res.status(400).json({ message: 'Missing required fields' });
@@ -64,13 +62,6 @@ exports.update = async (req, res) => {
 
   if (!salon) {
     return res.status(404).json({ message: 'Salon not found' });
-  }
-
-  const name = req.body.name;
-  const userSize = req.body.userSize;
-
-  if (!name || !userSize) {
-    return res.status(400).json({ message: 'Missing required fields' });
   }
 
   await Salon.update(req.body, {
