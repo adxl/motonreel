@@ -31,72 +31,77 @@ const showTables = async () => {
   });
 };
 
+/* Models Declaration */
+
+
+db.users = require('./models/Users.model')(connection, DataTypes);
+db.salon = require('./models/Salon.model')(connection, DataTypes);
+
+db.salonUser = require('./models/SalonUser.model')(connection, DataTypes);
+db.users.belongsToMany(db.salon, {
+  through: db.salonUser,
+});
+db.salon.belongsToMany(db.users, {
+  through: db.salonUser,
+});
+
+db.message = require('./models/Message.model')(connection, DataTypes);
+db.users.hasMany(db.message, {
+  foreignKey: 'sender',
+});
+
+db.salonMessage = require('./models/SalonMessage.model')(connection, DataTypes);
+db.message.belongsToMany(db.salon, {
+  through: db.salonMessage,
+});
+db.salon.belongsToMany(db.message, {
+  through: db.salonMessage,
+});
+
+db.commRequest = require('./models/CommRequest.model')(connection, DataTypes);
+db.users.hasMany(db.commRequest, {
+  foreignKey: {
+    name: 'client',
+    allowNull: false,
+  },
+});
+db.users.hasMany(db.commRequest, {
+  foreignKey: {
+    name: 'advisor',
+    allowNull: false,
+  },
+});
+
+
+db.commRequestMessage = require('./models/CommRequestMessage.model')(connection, DataTypes);
+db.message.belongsToMany(db.commRequest, {
+  through: db.commRequestMessage,
+});
+db.commRequest.belongsToMany(db.message, {
+  through: db.commRequestMessage,
+});
+
+db.rendezVousType = require('./models/RendezVousType.model')(connection, DataTypes);
+db.rendezVous = require('./models/RendezVous.model')(connection, DataTypes);
+db.rendezVousType.hasMany(db.rendezVous, {
+  foreignKey: {
+    name: 'type',
+    allowNull: false,
+  },
+});
+db.users.hasMany(db.rendezVous, {
+  foreignKey: {
+    name: 'client',
+    allowNull: false,
+  },
+});
+
+db.vehicles = require('./models/Vehicles.model')(connection, DataTypes);
+
+/* Database Initialization */
+
 const initDatabase = async () => {
   console.log('Initializing database');
-
-  db.users = require('./models/Users.model')(connection, DataTypes);
-  db.salon = require('./models/Salon.model')(connection, DataTypes);
-  
-  db.salonUser = require('./models/SalonUser.model')(connection, DataTypes);
-  db.users.belongsToMany(db.salon, {
-    through: db.salonUser,
-  });
-  db.salon.belongsToMany(db.users, {
-    through: db.salonUser,
-  });
-
-  db.message = require('./models/Message.model')(connection, DataTypes);
-  db.users.hasMany(db.message, {
-    foreignKey: 'sender',
-  });
-  
-  db.salonMessage = require('./models/SalonMessage.model')(connection, DataTypes);
-  db.message.belongsToMany(db.salon, {
-    through: db.salonMessage,
-  });
-  db.salon.belongsToMany(db.message, {
-    through: db.salonMessage,
-  });
-
-  db.commRequest = require('./models/CommRequest.model')(connection, DataTypes);
-  db.users.hasMany(db.commRequest, {
-    foreignKey: {
-      name: 'client',
-      allowNull: false,
-    },
-  });
-  db.users.hasMany(db.commRequest, {
-    foreignKey: {
-      name: 'advisor',
-      allowNull: false,
-    },
-  });
-
-  
-  db.commRequestMessage = require('./models/CommRequestMessage.model')(connection, DataTypes);
-  db.message.belongsToMany(db.commRequest, {
-    through: db.commRequestMessage,
-  });
-  db.commRequest.belongsToMany(db.message, {
-    through: db.commRequestMessage,
-  });
-
-  db.rendezVousType = require('./models/RendezVousType.model')(connection, DataTypes);
-  db.rendezVous = require('./models/RendezVous.model')(connection, DataTypes);
-  db.rendezVousType.hasMany(db.rendezVous, {
-    foreignKey: {
-      name: 'type',
-      allowNull: false,
-    },
-  });
-  db.users.hasMany(db.rendezVous, {
-    foreignKey: {
-      name: 'client',
-      allowNull: false,
-    },
-  });
-
-  db.vehicles = require('./models/Vehicles.model')(connection, DataTypes);
 
   db.connection.sync({ alter: true, logging: true, force: true });
 
@@ -104,5 +109,5 @@ const initDatabase = async () => {
 };
 
 module.exports = {
-  connection, showTables, initDatabase,
+  connection, showTables, initDatabase, db
 };

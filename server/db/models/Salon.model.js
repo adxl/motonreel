@@ -15,14 +15,5 @@ module.exports = (sequelize, DataTypes) => {
     },
   });
 
-  Salon.associate = (models) => {
-    Salon.belongsToMany(models.Users, {
-      through: models.SalonUser,
-    });
-    Salon.belongsToMany(models.Message, {
-      through: models.SalonMessage,
-    });
-  };
-
   return Salon;
 };

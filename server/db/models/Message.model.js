@@ -11,20 +11,5 @@ module.exports = (sequelize, DataTypes) => {
     },
   });
 
-  Message.associate = (models) => {
-    Message.belongsTo(models.Users, {
-      foreignKey: {
-        name: 'sender',
-        allowNull: false,
-      },
-    });
-    Message.belongsToMany(models.Salon, {
-      through: models.SalonMessage,
-    });
-    Message.belongsToMany(models.CommRequest, {
-      through: models.CommRequestMessage,
-    });
-  };
-
   return Message;
 };
