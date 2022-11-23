@@ -1,5 +1,6 @@
 const db = require('../db').db;
 const Salon = db.salon;
+const Users = db.users;
 
 exports.create = async (req, res) => {
   const { name, userSize } = req.body;
@@ -118,3 +119,74 @@ exports.delete = async (req, res) => {
       });
     });
 };
+
+/* Messages relation */
+
+exports.postMessage = async (req, res) => {
+  const { salonId, email, content } = req.body;
+
+  if (!salonId || !email || !message) {
+    return res.status(400).json({ message: 'Missing required fields' });
+  }
+
+  const salon = await Salon.findByPk(salonId);
+
+  if (!salon) {
+    return res.status(404).json({ message: 'Salon not found' });
+  }
+
+  const user = await Users.findByPk(email);
+
+  if (!user) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+
+  var message = {
+    sender: email,
+    content: content,
+  };
+
+  await salon.createMessage(message)
+    .then((data) => {
+      message = data;
+    })
+    .catch((err) => {
+      res.status(500).json({
+        message: err.message || 'Some error occurred while creating the Message.',
+      });
+    });
+
+  await Salon.addMessage(message)
+    .then((data) => {
+      return res.status(201).json({message: message, salonMessage: data});
+    })
+    .catch((err) => {
+      return res.status(500).json({
+        message: err.message || 'Some error occurred while creating the Salon Message.',
+      });
+    });
+};
+
+exports.getMessages = async (req, res) => {
+  const salonId = req.params.id;
+  
+  if (!salonId) {
+    return res.status(400).json({ message: 'Missing required fields' });
+  }
+
+  const salon = await Salon.findByPk(salonId);
+
+  if (!salon) {
+    return res.status(404).json({ message: 'Salon not found' });
+  }
+
+  const messages = await salon.getMessages();
+
+  if (!messages) {
+    return res.status(404).json({ message: 'No messages found' });
+  }
+
+  return res.status(200).json(messages);
+};
+
+// TODO: Add delete message and update message ?

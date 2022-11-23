@@ -31,6 +31,10 @@ app.patch('/salons/:id', salons.update);
 
 app.delete('/salons/:id', salons.delete);
 
+// Salon / Message Routes
+
+
+
 /* User Routes */
 
 const users = require('./controllers/users.controller');
