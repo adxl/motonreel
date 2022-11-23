@@ -45,6 +45,12 @@ app.patch('/users/:id', users.update);
 
 app.delete('/users/:id', users.delete);
 
+// User / Salon Routes
+
+app.post('/users/addSalon', users.addSalon);
+
+app.post('/users/removeSalon', users.removeSalon);
+
 /* Vehicle Routes */
 
 const vehicles = require('./controllers/vehicles.controller');
