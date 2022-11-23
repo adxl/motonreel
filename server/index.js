@@ -27,6 +27,8 @@ app.get('/salons', salons.findAll);
 
 app.get('/salons/:id', salons.findOne);
 
+app.get('/salons/:id/users', salons.getUsers);
+
 app.patch('/salons/:id', salons.update);
 
 app.delete('/salons/:id', salons.delete);

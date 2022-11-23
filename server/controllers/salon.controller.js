@@ -52,6 +52,28 @@ exports.findOne = async (req, res) => {
   return res.status(200).json(salon);
 };
 
+exports.getUsers = async (req, res) => {
+  const id = req.params.id;
+
+  if (!id) {
+    return res.status(400).json({ message: 'Missing required fields' });
+  }
+
+  const salon = await Salon.findByPk(id);
+  
+  if (!salon) {
+    return res.status(404).json({ message: 'Salon not found' });
+  }
+
+  const users = await salon.getUsers();
+
+  if (!users) {
+    return res.status(404).json({ message: 'No users found' });
+  }
+
+  return res.status(200).json(users);
+};
+
 exports.update = async (req, res) => {
   const id = req.params.id;
 
@@ -190,6 +212,3 @@ exports.getMessages = async (req, res) => {
 };
 
 // QUESTION : Add delete message and update message ?
-
-// TODO : Add get all users
-
