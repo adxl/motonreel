@@ -45,6 +45,20 @@ app.patch('/users/:id', users.update);
 
 app.delete('/users/:id', users.delete);
 
+/* Vehicle Routes */
+
+const vehicles = require('./controllers/vehicles.controller');
+
+app.post('/vehicles/create', vehicles.create);
+
+app.get('/vehicles', vehicles.findAll);
+
+app.get('/vehicles/:id', vehicles.findOne);
+
+app.patch('/vehicles/:id', vehicles.update);
+
+app.delete('/vehicles/:id', vehicles.delete);
+
 const { PORT } = process.env;
 app.listen(PORT, () => {
   console.log(`Running on http://0.0.0.0:${PORT}`);
