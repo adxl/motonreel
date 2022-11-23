@@ -84,6 +84,8 @@ exports.update = async (req, res) => {
     });
 };
 
+// QUESTION : Hard or soft delete ?
+
 exports.delete = async (req, res) => {
   const email = req.params.email;
 

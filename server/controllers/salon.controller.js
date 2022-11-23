@@ -189,4 +189,7 @@ exports.getMessages = async (req, res) => {
   return res.status(200).json(messages);
 };
 
-// TODO: Add delete message and update message ?
+// QUESTION : Add delete message and update message ?
+
+// TODO : Add get all users
+

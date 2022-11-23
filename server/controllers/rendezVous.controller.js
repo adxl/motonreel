@@ -65,6 +65,8 @@ exports.findOne = async (req, res) => {
   return res.status(200).json(rendezVous);
 };
 
+// QUESTION : find all by user unnecessary? Filter on client side after findAll?
+
 exports.findAllByUser = async (req, res) => {
   const email = req.params.email;
 
