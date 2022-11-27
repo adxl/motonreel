@@ -10,6 +10,7 @@ export default defineConfig({
       "@api": path.resolve("./src/api"),
       "@components": path.resolve("./src/components"),
       "@hooks": path.resolve("./src/hooks"),
+      "@pages": path.resolve("./src/pages"),
     },
   },
   plugins: [react()],
