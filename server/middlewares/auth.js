@@ -1,5 +1,5 @@
 const { verifyToken } = require('../lib/jwt');
-const { User } = require('../models');
+const { User } = require('../db');
 
 module.exports = async (req, res, next) => {
   const header = req.headers.authorization;

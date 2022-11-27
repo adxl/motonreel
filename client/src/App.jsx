@@ -1,19 +1,35 @@
-import reactLogo from './assets/react.svg';
-import './App.css';
+import React, { Suspense } from "react";
+import {
+  HashRouter as Router,
+  Navigate,
+  Route,
+  Routes,
+} from "react-router-dom";
 
-function App() {
+import ProtectedRoute from "@components/ProtectedRoute";
+
+import "./App.css";
+
+const Error = React.lazy(() => import("./pages/Error"));
+
+export default function App() {
   return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank" rel="noreferrer">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank" rel="noreferrer">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
+    <div id="app">
+      <Suspense fallback={"loading..."}>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Navigate to="/profile" />} />
+            <Route exact path="/login" element={"login"} />
+            <Route exact path="/register" element={"register"} />
+            <Route
+              exact
+              path="/profile"
+              element={<ProtectedRoute el={"profile"} />}
+            />
+            <Route path="*" element={<Error />} />
+          </Routes>
+        </Router>
+      </Suspense>
     </div>
   );
 }
-
-export default App;
