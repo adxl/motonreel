@@ -6,7 +6,7 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { useNavigate } from "react-dom";
+import { redirect } from "react-router-dom";
 
 import { getCurrentUser, login } from "../api/auth";
 
@@ -14,8 +14,6 @@ const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
 
 export function AuthProvider({ children }) {
-  const navigate = useNavigate();
-
   const [_user, setUser] = useState({});
   const [_token, setToken] = useState();
 
@@ -28,7 +26,7 @@ export function AuthProvider({ children }) {
       })
       .catch((_) => {
         debugger;
-        navigate("/login");
+        redirect("/login");
       });
   }, []);
 
@@ -56,15 +54,15 @@ export function AuthProvider({ children }) {
 
   const handleLogout = useCallback(() => {
     setToken(null);
-    navigate("/login");
+    redirect("/login");
   }, []);
 
   const value = useMemo(
     () => ({
       token: _token,
       user: _user,
-      onLogin: handleLogin,
-      onLogout: handleLogout,
+      login: handleLogin,
+      logout: handleLogout,
     }),
     [_token, _user]
   );
