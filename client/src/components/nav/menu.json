@@ -1,0 +1,28 @@
+{
+  "ADMIN": [
+    {
+      "key": "admin_some",
+      "name": "Some-Admin-Menu",
+      "path": "/admin/some"
+    },
+
+    {
+      "key": "admin_another_menu",
+      "name": "Another-Admin-Menu",
+      "path": "/admin/another"
+    }
+  ],
+
+  "USER": [
+    {
+      "key": "user_some_menu",
+      "name": "Some User Menu",
+      "path": "/some"
+    },
+    {
+      "key": "user_another_menu",
+      "name": "Another User Menu",
+      "path": "/another"
+    }
+  ]
+}

@@ -41,7 +41,7 @@ export default function Login() {
   }
 
   useEffect(() => {
-    if (token) return redirect("/");
+    if (token) redirect("/");
   }, [token]);
 
   return (

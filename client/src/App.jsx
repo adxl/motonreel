@@ -12,6 +12,7 @@ import "./App.css";
 
 const Login = React.lazy(() => import("@pages/Login"));
 const Register = React.lazy(() => import("@pages/Register"));
+const Home = React.lazy(() => import("@pages/Home"));
 const Error = React.lazy(() => import("@pages/Error"));
 
 import { AuthProvider } from "@hooks/auth";
@@ -23,13 +24,13 @@ export default function App() {
         <Suspense fallback={"loading..."}>
           <Router>
             <Routes>
-              <Route path="/" element={<Navigate to="/profile" />} />
+              <Route path="/" element={<Navigate to="/home" />} />
               <Route exact path="/login" element={<Login />} />
               <Route exact path="/register" element={<Register />} />
               <Route
                 exact
-                path="/profile"
-                element={<ProtectedRoute el={"profile"} />}
+                path="/home"
+                element={<ProtectedRoute el={Home} />}
               />
               <Route path="*" element={<Error />} />
             </Routes>

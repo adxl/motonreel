@@ -18,6 +18,16 @@ export function AuthProvider({ children }) {
   const [_token, setToken] = useState();
 
   const refreshUser = useCallback((token) => {
+    /* MOCK USER */
+    const __user = {
+      name: "John Doe",
+      isAdmin: true,
+      email: "jd@esgi.fr",
+    };
+    setToken("t0k3n");
+    return setUser(__user);
+    /* END MOCK USER */
+
     if (!token) return;
 
     getCurrentUser(token)
