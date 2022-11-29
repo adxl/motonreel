@@ -71,8 +71,7 @@ exports.login = async (req, res) => {
     }
   ).then((num) => {
     if (num == 1) {
-      user.token = token;
-      return res.status(200).json({ data: user });
+      return res.status(200).json({ token });
     } else {
       return res.status(500).json({
         message: `Cannot update User with email=${email}. Maybe User was not found or req.body is empty!`,
