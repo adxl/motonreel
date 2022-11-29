@@ -6,7 +6,7 @@ export function getCurrentUser(token) {
 
 export function register(name, email, password) {
   const data = { name, email, password };
-  return _post("register", data);
+  return _post("/register", data);
 }
 
 export function login(email, password) {

@@ -36,7 +36,6 @@ export default function Login() {
     if (_passwordInput !== _secondPasswordInput) {
       return;
     }
-    debugger;
     register(_nameInput, _emailInput, _passwordInput);
   }
 

@@ -52,13 +52,13 @@ export function AuthProvider({ children }) {
     refreshUser(_token);
   }, [_token]);
 
-  const handleLogin = useCallback((data) => {
-    login(data)
+  const handleLogin = useCallback((email, password) => {
+    login(email, password)
       .then(({ data: user }) => {
         setToken(user.token);
       })
       .catch((_) => {
-        debugger;
+        console.log("error");
       });
   });
 

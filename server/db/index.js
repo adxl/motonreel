@@ -16,6 +16,11 @@ const connection = new Sequelize(process.env.DATABASE_URL, {
   dialectOptions,
 });
 
+const db = {};
+
+db.Sequelize = Sequelize;
+db.connection = connection;
+
 connection.authenticate().then(() => {
   console.log('Connection OK');
 });
@@ -26,217 +31,83 @@ const showTables = async () => {
   });
 };
 
+/* Models Declaration */
+
+
+db.users = require('./models/Users.model')(connection, DataTypes);
+db.salon = require('./models/Salon.model')(connection, DataTypes);
+
+db.salonUser = require('./models/SalonUser.model')(connection, DataTypes);
+db.users.belongsToMany(db.salon, {
+  through: db.salonUser,
+});
+db.salon.belongsToMany(db.users, {
+  through: db.salonUser,
+});
+
+db.message = require('./models/Message.model')(connection, DataTypes);
+db.users.hasMany(db.message, {
+  foreignKey: 'sender',
+});
+
+db.salonMessage = require('./models/SalonMessage.model')(connection, DataTypes);
+db.message.belongsToMany(db.salon, {
+  through: db.salonMessage,
+});
+db.salon.belongsToMany(db.message, {
+  through: db.salonMessage,
+});
+
+db.commRequest = require('./models/CommRequest.model')(connection, DataTypes);
+db.users.hasMany(db.commRequest, {
+  foreignKey: {
+    name: 'client',
+    allowNull: false,
+  },
+});
+db.users.hasMany(db.commRequest, {
+  foreignKey: {
+    name: 'advisor',
+    allowNull: false,
+  },
+});
+
+
+db.commRequestMessage = require('./models/CommRequestMessage.model')(connection, DataTypes);
+db.message.belongsToMany(db.commRequest, {
+  through: db.commRequestMessage,
+});
+db.commRequest.belongsToMany(db.message, {
+  through: db.commRequestMessage,
+});
+
+db.rendezVousType = require('./models/RendezVousType.model')(connection, DataTypes);
+db.rendezVous = require('./models/RendezVous.model')(connection, DataTypes);
+db.rendezVousType.hasMany(db.rendezVous, {
+  foreignKey: {
+    name: 'type',
+    allowNull: false,
+  },
+});
+db.users.hasMany(db.rendezVous, {
+  foreignKey: {
+    name: 'client',
+    allowNull: false,
+  },
+});
+
+db.vehicles = require('./models/Vehicles.model')(connection, DataTypes);
+
+/* Database Initialization */
+
 const initDatabase = async () => {
-  const Users = connection.define('Users', {
-    email: {
-      type: DataTypes.STRING,
-      primaryKey: true,
-      allowNull: false,
-      unique: true,
-    },
-    password: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    token: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    isAdmin: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
-    },
-    disponibility: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: true,
-    },
-  });
-  await Users.sync({ alter: true });
+  console.log('Initializing database');
 
-  const Salon = connection.define('Salon', {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    userSize: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-  });
-  await Salon.sync({ alter: true });
-
-  const SalonUser = connection.define('SalonUser', {
-    salon: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      primaryKey: true,
-      references: {
-        model: Salon,
-        key: 'id',
-      },
-    },
-    user: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      primaryKey: true,
-      references: {
-        model: Users,
-        key: 'email',
-      },
-    },
-    joined: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
-    },
-  });
-  await SalonUser.sync({ alter: true });
-
-  const Message = connection.define('Message', {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-    sender: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      references: {
-        model: Users,
-        key: 'email',
-      },
-    },
-    content: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-  });
-  await Message.sync({ alter: true });
-
-  const SalonMessage = connection.define('SalonMessage', {
-    salon: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      primaryKey: true,
-      references: {
-        model: Salon,
-        key: 'id',
-      },
-    },
-    message: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      primaryKey: true,
-      references: {
-        model: Message,
-        key: 'id',
-      },
-    },
-  });
-  await SalonMessage.sync({ alter: true });
-
-  const CommRequest = connection.define('CommRequest', {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-    status: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 0,
-    },
-    client: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      references: {
-        model: Users,
-        key: 'email',
-      },
-    },
-    advisor: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      references: {
-        model: Users,
-        key: 'email',
-      },
-    },
-  });
-  await CommRequest.sync({ alter: true });
-
-  const CommRequestMessage = connection.define('CommRequestMessage', {
-    message: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      primaryKey: true,
-      references: {
-        model: Message,
-        key: 'id',
-      },
-    },
-    request: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      primaryKey: true,
-      references: {
-        model: CommRequest,
-        key: 'id',
-      },
-    },
-  });
-  await CommRequestMessage.sync({ alter: true });
-
-  const RendezVousType = connection.define('RendezVousType', {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-  });
-  await RendezVousType.sync({ alter: true });
-
-  const RendezVous = connection.define('RendezVous', {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-    date: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
-    client: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      references: {
-        model: Users,
-        key: 'email',
-      },
-    },
-  });
-  await RendezVous.sync({ alter: true });
-
-  await connection.sync({ alter: true, logging: false });
+  db.connection.sync({ alter: true, logging: true, force: true });
 
   console.log('Database synced');
 };
 
 module.exports = {
-  connection, showTables, initDatabase,
+  connection, showTables, initDatabase, db
 };
