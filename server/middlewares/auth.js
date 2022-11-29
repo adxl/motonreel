@@ -1,5 +1,6 @@
 const { verifyToken } = require('../lib/jwt');
-const { User } = require('../db');
+const db = require('../db').db;
+const Users = db.users;
 
 module.exports = async (req, res, next) => {
   const header = req.headers.authorization;
@@ -14,7 +15,7 @@ module.exports = async (req, res, next) => {
 
   const user = await verifyToken(token);
   if (user) {
-    req.user = await User.findByPk(
+    req.user = await Users.findByPk(
       user.email,
       {
         // permet de récupérer des données de jointure
