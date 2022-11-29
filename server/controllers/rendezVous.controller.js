@@ -3,10 +3,22 @@ const RendezVous = db.rendezVous;
 const Users = db.users;
 const RendezVousType = db.rendezVousType;
 
-exports.create = async (req, res) => {
-  const { type, date, email } = req.body;
+// TODO : Check if user exists in all the methods
+// TODO : Apart from create, check if the user is the client of the rendezVous
 
-  if (!type || !date || !user) {
+exports.create = async (req, res) => {
+
+  const reqUser = req.user.id;
+
+  const user = await Users.findByPk(reqUser);
+
+  if (!user) {
+    return res.status(401).json({ message: 'Access denied !' });
+  }
+  
+  const { type, date } = req.body;
+
+  if (!type || !date) {
     return res.status(400).json({ message: 'Missing required fields' });
   }
 
@@ -16,16 +28,10 @@ exports.create = async (req, res) => {
     return res.status(404).json({ message: 'RendezVousType not found' });
   }
 
-  const user = await Users.findByPk(email);
-
-  if (!user) {
-    return res.status(404).json({ message: 'User not found' });
-  }
-
   const rendezVous = {
     type: type,
     date: date,
-    client: email,
+    client: reqUser,
   };
 
   await RendezVous.create(rendezVous)
@@ -40,6 +46,15 @@ exports.create = async (req, res) => {
 };
 
 exports.findAll = async (req, res) => {
+
+  const reqUser = req.user.id;
+
+  const user = await Users.findByPk(reqUser);
+
+  if (!user || !user.isAdmin) {
+    return res.status(401).json({ message: 'Access denied !' });
+  }
+
   const rendezVous = await RendezVous.findAll();
 
   if (!rendezVous) {
@@ -50,6 +65,15 @@ exports.findAll = async (req, res) => {
 };
 
 exports.findOne = async (req, res) => {
+
+  const reqUser = req.user.id;
+
+  const user = await Users.findByPk(reqUser);
+
+  if (!user) {
+    return res.status(401).json({ message: 'Access denied !' });
+  }
+
   const id = req.params.id;
 
   if (!id) {
@@ -62,20 +86,24 @@ exports.findOne = async (req, res) => {
     return res.status(404).json({ message: 'RendezVous not found' });
   }
 
+  if (rendezVous.client !== reqUser && !user.isAdmin) {
+    return res.status(401).json({ message: 'Access denied !' });
+  }
+
   return res.status(200).json(rendezVous);
 };
 
-// QUESTION : find all by user unnecessary? Filter on client side after findAll?
+exports.findAllByToken = async (req, res) => {
+  const reqUser = req.user.id;
 
-exports.findAllByUser = async (req, res) => {
-  const email = req.params.email;
+  const user = await Users.findByPk(reqUser);
 
-  if (!email) {
-    return res.status(400).json({ message: 'Missing required fields' });
+  if (!user || user.isAdmin) {
+    return res.status(401).json({ message: 'Access denied !' });
   }
 
   const rendezVous = await RendezVous.findAll({
-    where: { client: email },
+    where: { client: reqUser },
   });
 
   if (!rendezVous) {
@@ -86,6 +114,15 @@ exports.findAllByUser = async (req, res) => {
 };
 
 exports.update = async (req, res) => {
+
+  const reqUser = req.user.id;
+
+  const user = await Users.findByPk(reqUser);
+
+  if (!user || !user.isAdmin) {
+    return res.status(401).json({ message: 'Access denied !' });
+  }
+
   const id = req.params.id;
 
   if (!id) {
@@ -112,7 +149,7 @@ exports.update = async (req, res) => {
         });
       }
     })
-    .catch((err) => {
+    .catch(() => {
       res.status(500).json({
         message: 'Error updating RendezVous with id=' + id,
       });
@@ -120,6 +157,15 @@ exports.update = async (req, res) => {
 };
 
 exports.delete = async (req, res) => {
+
+  const reqUser = req.user.id;
+
+  const user = await Users.findByPk(reqUser);
+
+  if (!user) {
+    return res.status(401).json({ message: 'Access denied !' });
+  }
+
   const id = req.params.id;
 
   if (!id) {
@@ -130,6 +176,10 @@ exports.delete = async (req, res) => {
 
   if (!rendezVous) {
     return res.status(404).json({ message: 'RendezVous not found' });
+  }
+
+  if (rendezVous.client !== reqUser && !user.isAdmin) {
+    return res.status(401).json({ message: 'Access denied !' });
   }
 
   await RendezVous.destroy({
@@ -146,11 +196,9 @@ exports.delete = async (req, res) => {
         });
       }
     })
-    .catch((err) => {
+    .catch(() => {
       res.status(500).json({
         message: 'Could not delete RendezVous with id=' + id,
       });
     });
 };
-
-// QUESTION : find all by type ?

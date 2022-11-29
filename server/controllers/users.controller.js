@@ -1,21 +1,32 @@
+const jwt = require('../lib/jwt');
+const bcrypt = require('bcryptjs');
+
 const db = require('../db').db;
 const Users = db.users;
 const Salon = db.salon;
 
-exports.create = async (req, res) => {
-  const { email, password, name, token, isAdmin, disponibility } = req.body;
+// TODO : Apart from create, connected user access
 
-  if (!email || !password || !name || !token || typeof isAdmin === 'undefined' || typeof disponibility === 'undefined') {
-    return res.status(400).json({ message: `Missing required fields ${email} ${password} ${name} ${token} ${isAdmin} ${disponibility}` });
+exports.create = async (req, res) => {
+
+  const { email, password, name } = req.body;
+
+  if (!email || !password || !name) {
+    return res.status(400).json({ message: `Missing required fields ${email} ${password} ${name}` });
   }
+  
+
+  const salt = await bcrypt.genSalt(10);
+
+  const hashedPassword = await bcrypt.hash(password, salt);
 
   const user = {
     email: email,
-    password: password,
+    password: hashedPassword,
     name: name,
-    token: token,
-    isAdmin: isAdmin,
-    disponibility: disponibility,
+    token: '',
+    isAdmin: false,
+    disponibility: false,
   };
 
   await Users.create(user)
@@ -29,7 +40,76 @@ exports.create = async (req, res) => {
     });
 };
 
+exports.login = async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ message: `Missing required fields ${email} ${password}` });
+  }
+  
+  const user = await Users.findByPk(email);
+
+  if (!user) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+
+  const same = await bcrypt.compare(password, user.password);
+
+  if (!same) {
+    return res.status(401).json({ message: 'Wrong password' });
+  }
+
+  const token = await jwt.createToken(user);
+
+  await Users.update(
+    { token: token }, 
+    {
+      where: {
+        email: email,
+      },
+    }
+  ).then((num) => {
+    if (num == 1) {
+      user.token = token;
+      return res.status(200).json({ data: user });
+    } else {
+      return res.status(500).json({
+        message: `Cannot update User with email=${email}. Maybe User was not found or req.body is empty!`,
+      });
+    }
+  });
+};
+
+exports.findOneByToken = async (req, res) => {
+  const token = req.headers.authorization.split(' ')[1];
+
+  if (!token) {
+    return res.status(400).json({ message: 'Missing required fields' });
+  }
+
+  const user = await Users.findOne({
+    where: {
+      token: token,
+    },
+  });
+
+  if (!user) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+
+  return res.status(200).json({ data: user });
+};
+
 exports.findAll = async (req, res) => {
+
+  const reqUser = req.user.id;
+
+  const user = await Users.findByPk(reqUser);
+
+  if (!user || !user.isAdmin) {
+    return res.status(401).json({ message: 'Access denied !' });
+  }
+
   const users = await Users.findAll();
 
   if (!users) {
@@ -40,23 +120,43 @@ exports.findAll = async (req, res) => {
 };
 
 exports.findOne = async (req, res) => {
-  const email = req.params.email;
 
-  if (!email) {
-    return res.status(400).json({ message: 'Missing required fields' });
-  }
+  const reqUser = req.user.id;
 
-  const user = await Users.findByPk(email);
+  const user = await Users.findByPk(reqUser);
 
   if (!user) {
-    return res.status(404).json({ message: 'User not found' });
+    return res.status(401).json({ message: 'Access denied !' });
   }
 
-  return res.status(200).json(user);
+  const email = req.body.email;
+
+  if (!user.isAdmin) {
+
+    return res.status(200).json(user);
+
+  } else {
+
+    if (!email) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
+  
+    const user = await Users.findByPk(email);
+  
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+  
+    return res.status(200).json(user);
+
+  }
 };
 
 exports.update = async (req, res) => {
-  const email = req.params.email;
+
+  // User can only update himself
+
+  const email = req.user.id;
 
   if (!email) {
     return res.status(400).json({ message: 'Missing required fields' });
@@ -69,7 +169,7 @@ exports.update = async (req, res) => {
   }
 
   await Users.update(req.body, {
-    where: { email: email },
+    where: { email: user.email },
   })
     .then((num) => {
       if (num == 1) {
@@ -87,7 +187,10 @@ exports.update = async (req, res) => {
 // QUESTION : Hard or soft delete ?
 
 exports.delete = async (req, res) => {
-  const email = req.params.email;
+
+  // User can only delete himself
+
+  const email = req.user.id;
 
   if (!email) {
     return res.status(400).json({ message: 'Missing required fields' });
@@ -100,7 +203,7 @@ exports.delete = async (req, res) => {
   }
 
   await Users.destroy({
-    where: { email: email },
+    where: { email: user.email },
   })
     .then((num) => {
       if (num == 1) {
@@ -113,7 +216,7 @@ exports.delete = async (req, res) => {
         });
       }
     })
-    .catch((err) => {
+    .catch(() => {
       res.status(500).json({
         message: 'Could not delete User',
       });
@@ -123,9 +226,12 @@ exports.delete = async (req, res) => {
 /* Salon relation */
 
 exports.addSalon = async (req, res) => {
-  const { email, salonId } = req.body;
+  const email = req.user.id;
+  const salonId = req.body;
 
-  if (!email || !salonId) {
+  // TODO : Check for salon capacity
+
+  if (!salonId) {
     return res.status(400).json({ message: 'Missing required fields.' });
   }
 
@@ -155,9 +261,10 @@ exports.addSalon = async (req, res) => {
 };
 
 exports.removeSalon = async (req, res) => {
-  const { email, salonId } = req.body;
+  const email = req.user.id;
+  const salonId = req.body;
 
-  if (!email || !salonId) {
+  if (!salonId) {
     return res.status(400).json({ message: 'Missing required fields.' });
   }
 
@@ -183,3 +290,4 @@ exports.removeSalon = async (req, res) => {
       });
     });
 };
+

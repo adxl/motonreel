@@ -1,6 +1,10 @@
 const db = require('../db').db;
 const Salon = db.salon;
 const Users = db.users;
+const Message = db.message;
+
+// TODO : Check if user exists in all the methods
+// TODO : Apart from Message methods and findAll, check if user is an admin in all the methods
 
 exports.create = async (req, res) => {
   const { name, userSize } = req.body;
@@ -101,7 +105,7 @@ exports.update = async (req, res) => {
         });
       }
     })
-    .catch((err) => {
+    .catch(() => {
       res.status(500).json({
         message: 'Error updating Salon',
       });
@@ -135,7 +139,7 @@ exports.delete = async (req, res) => {
         });
       }
     })
-    .catch((err) => {
+    .catch(() => {
       res.status(500).json({
         message: 'Could not delete Salon',
       });
@@ -144,8 +148,11 @@ exports.delete = async (req, res) => {
 
 /* Messages relation */
 
+// TODO : Check if user is an admin or in the salon
+
 exports.postMessage = async (req, res) => {
-  const { salonId, email, content } = req.body;
+  const { salonId, content } = req.body;
+  const email = req.user.id;
 
   if (!salonId || !email || !message) {
     return res.status(400).json({ message: 'Missing required fields' });
@@ -168,25 +175,17 @@ exports.postMessage = async (req, res) => {
     content: content,
   };
 
-  await salon.createMessage(message)
+  await Message.createMessage(message)
     .then((data) => {
-      message = data;
+      Salon.addMessage(message);
+      res.status(201).json(data);
     })
     .catch((err) => {
       res.status(500).json({
         message: err.message || 'Some error occurred while creating the Message.',
       });
     });
-
-  await Salon.addMessage(message)
-    .then((data) => {
-      return res.status(201).json({message: message, salonMessage: data});
-    })
-    .catch((err) => {
-      return res.status(500).json({
-        message: err.message || 'Some error occurred while creating the Salon Message.',
-      });
-    });
+  
 };
 
 exports.getMessages = async (req, res) => {

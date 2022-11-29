@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 
 const app = express();
+const auth = require('./middlewares/auth');
 
 const corsConfig = {
   origin: 'http://localhost:3000',
@@ -21,17 +22,17 @@ app.use(express.json());
 
 const salons = require('./controllers/salon.controller');
 
-app.post('/salons/create', salons.create);
+app.post('/salons/create', auth, salons.create);
 
-app.get('/salons', salons.findAll);
+app.get('/salons', auth, salons.findAll);
 
-app.get('/salons/:id', salons.findOne);
+app.get('/salons/:id', auth, salons.findOne);
 
-app.get('/salons/:id/users', salons.getUsers);
+app.get('/salons/:id/users', auth, salons.getUsers);
 
-app.patch('/salons/:id', salons.update);
+app.patch('/salons/:id', auth, salons.update);
 
-app.delete('/salons/:id', salons.delete);
+app.delete('/salons/:id', auth, salons.delete);
 
 // Salon / Message Routes
 
@@ -41,21 +42,25 @@ app.delete('/salons/:id', salons.delete);
 
 const users = require('./controllers/users.controller');
 
-app.post('/users/create', users.create);
+app.post('/register', users.create);
 
-app.get('/users', users.findAll);
+app.post('/login', users.login);
 
-app.get('/users/:id', users.findOne);
+app.get('/me', auth, users.findOneByToken);
 
-app.patch('/users/:id', users.update);
+app.get('/users', auth, users.findAll);
 
-app.delete('/users/:id', users.delete);
+app.get('/users/:id', auth, users.findOne);
+
+app.patch('/users/:id', auth, users.update);
+
+app.delete('/users/:id', auth, users.delete);
 
 // User / Salon Routes
 
-app.post('/users/addSalon', users.addSalon);
+app.post('/users/addSalon', auth, users.addSalon);
 
-app.post('/users/removeSalon', users.removeSalon);
+app.post('/users/removeSalon', auth, users.removeSalon);
 
 /* Vehicle Routes */
 
