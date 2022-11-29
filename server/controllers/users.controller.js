@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const db = require('../db').db;
 const Users = db.users;
 const Salon = db.salon;
+const SalonController = require('./salon.controller');
 
 // TODO : Apart from create, connected user access
 
@@ -229,8 +230,6 @@ exports.addSalon = async (req, res) => {
   const email = req.user.id;
   const salonId = req.body;
 
-  // TODO : Check for salon capacity
-
   if (!salonId) {
     return res.status(400).json({ message: 'Missing required fields.' });
   }
@@ -245,6 +244,12 @@ exports.addSalon = async (req, res) => {
 
   if (!salon) {
     return res.status(404).json({ message: 'Salon not found' });
+  }
+
+  const totalSalonUsers = await SalonController.getUsers(salonId);
+
+  if (totalSalonUsers >= salon.userSize) {
+    return res.status(400).json({ message: 'Salon is full' });
   }
 
   await user.addSalon(salon, {
