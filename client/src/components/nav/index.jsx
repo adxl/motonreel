@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Badge from "react-bootstrap/Badge";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
@@ -6,7 +7,7 @@ import { LinkContainer } from "react-router-bootstrap";
 
 import { useAuth } from "@hooks/auth";
 
-import menuData from "./menu.json";
+import menu from "./menu.json";
 
 const Separator = React.memo(function Separator() {
   return (
@@ -18,12 +19,6 @@ const Separator = React.memo(function Separator() {
 
 export default React.memo(function Header() {
   const { user } = useAuth();
-  const [_menu, setMenu] = useState([]);
-
-  useEffect(() => {
-    const key = user.isAdmin ? "ADMIN" : "USER";
-    setMenu(menuData[key]);
-  }, [user.isAdmin]);
 
   return (
     <Navbar
@@ -40,14 +35,14 @@ export default React.memo(function Header() {
         <Navbar.Toggle />
         <Navbar.Collapse className="pt-0">
           <Nav className="align-items-center">
-            {_menu.map(({ key, name, path }, i) => (
+            {menu.map(({ key, name, path }, i) => (
               <React.Fragment key={key}>
                 <LinkContainer to={path}>
                   <Nav.Link className="d-flex align-items-center">
                     {name}
                   </Nav.Link>
                 </LinkContainer>
-                {i < _menu.length - 1 && <Separator />}
+                {i < menu.length - 1 && <Separator />}
               </React.Fragment>
             ))}
           </Nav>
@@ -55,6 +50,7 @@ export default React.memo(function Header() {
         <div className="d-flex align-items-center">
           <Nav.Item className="d-flex align-items-center">
             <span className="text-white mx-2">Bonjour, {user.name}</span>
+            <Badge bg="danger">{user.isAdmin && "Admin"}</Badge>
           </Nav.Item>
           <Separator />
           <LinkContainer to={"/logout"}>
