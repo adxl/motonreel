@@ -90,7 +90,7 @@ exports.findOneByToken = async (req, res) => {
 
   const user = await Users.findOne({
     where: {
-      token: token,
+      token,
     },
   });
 
@@ -98,7 +98,7 @@ exports.findOneByToken = async (req, res) => {
     return res.status(404).json({ message: 'User not found' });
   }
 
-  return res.status(200).json({ user });
+  return res.status(200).json(user);
 };
 
 exports.findAll = async (req, res) => {

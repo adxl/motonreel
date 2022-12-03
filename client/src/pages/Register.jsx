@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
-import { Link, redirect } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 
 import { register } from "@api/auth";
 import { useAuth } from "@hooks/auth";
 
-export default function Login() {
+export default function Register() {
   const { token } = useAuth();
 
   const [_nameInput, setNameInput] = useState("");
@@ -39,10 +39,9 @@ export default function Login() {
     register(_nameInput, _emailInput, _passwordInput);
   }
 
-  useEffect(() => {
-    if (token) redirect("/");
-  }, [token]);
-
+  if (token) {
+    return <Navigate to="/" />;
+  }
   return (
     <Container>
       <h1 className="mb-5">Inscription</h1>

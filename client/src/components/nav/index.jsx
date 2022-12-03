@@ -17,7 +17,7 @@ const Separator = React.memo(function Separator() {
 });
 
 export default React.memo(function Header() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const [_menu, setMenu] = useState([]);
 
   useEffect(() => {
@@ -57,9 +57,11 @@ export default React.memo(function Header() {
             <span className="text-white mx-2">Bonjour, {user.name}</span>
           </Nav.Item>
           <Separator />
-          <Nav.Link className="d-flex align-items-center" onClick={logout}>
-            <span className="text-white">Se déconnecter</span>
-          </Nav.Link>
+          <LinkContainer to={"/logout"}>
+            <Nav.Link className="d-flex align-items-center">
+              <span className="text-white">Se déconnecter</span>
+            </Nav.Link>
+          </LinkContainer>
         </div>
       </Container>
     </Navbar>

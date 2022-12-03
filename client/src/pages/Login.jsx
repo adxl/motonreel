@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
-import { Link, redirect } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 
 import { useAuth } from "@hooks/auth";
 
@@ -26,9 +26,9 @@ export default function Login() {
     login(_emailInput, _passwordInput);
   }
 
-  useEffect(() => {
-    if (token) redirect("/");
-  }, [token]);
+  if (token) {
+    return <Navigate to="/" />;
+  }
 
   return (
     <Container>

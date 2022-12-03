@@ -11,6 +11,7 @@ import ProtectedRoute from "@components/ProtectedRoute";
 import "./App.css";
 
 const Login = React.lazy(() => import("@pages/Login"));
+const Logout = React.lazy(() => import("@pages/Logout"));
 const Register = React.lazy(() => import("@pages/Register"));
 const Home = React.lazy(() => import("@pages/Home"));
 const Error = React.lazy(() => import("@pages/Error"));
@@ -33,6 +34,7 @@ export default function App() {
                 element={<ProtectedRoute el={Home} />}
               />
               <Route path="*" element={<Error />} />
+              <Route exact path="/logout" element={<Logout />} />
             </Routes>
           </Router>
         </Suspense>

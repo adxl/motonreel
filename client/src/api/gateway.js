@@ -3,15 +3,15 @@ import axios from "axios";
 const URL = import.meta.env.VITE_API_URL;
 
 function get_headers(token) {
-  const _headers = {
+  const headers = {
     "Content-Type": "application/json",
   };
 
   if (token) {
-    _headers["Authorization"] = `Bearer ${token}`;
+    headers["Authorization"] = `Bearer ${token}`;
   }
 
-  return _headers;
+  return headers;
 }
 
 export function _get(path, token) {
