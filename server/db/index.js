@@ -45,6 +45,16 @@ db.salon.belongsToMany(db.users, {
   through: db.salonUser,
 });
 
+db.privateChat = require('./models/PrivateChat.model')(connection, DataTypes);
+db.users.hasMany(db.privateChat, {
+  foreignKey: 'firUser',
+  allowNull: false,
+});
+db.users.hasMany(db.privateChat, {
+  foreignKey: 'secUser',
+  allowNull: false,
+});
+
 db.message = require('./models/Message.model')(connection, DataTypes);
 db.users.hasMany(db.message, {
   foreignKey: 'sender',
@@ -56,6 +66,14 @@ db.message.belongsToMany(db.salon, {
 });
 db.salon.belongsToMany(db.message, {
   through: db.salonMessage,
+});
+
+db.privateChatMessage = require('./models/PrivateChatMessage.model')(connection, DataTypes);
+db.message.belongsToMany(db.privateChat, {
+  through: db.privateChatMessage,
+});
+db.privateChat.belongsToMany(db.message, {
+  through: db.privateChatMessage,
 });
 
 db.commRequest = require('./models/CommRequest.model')(connection, DataTypes);

@@ -1,9 +1,9 @@
 module.exports = (sequelize, DataTypes) => {
   const CommRequest = sequelize.define('CommRequest', {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
     },
     status: {
       type: DataTypes.INTEGER,
