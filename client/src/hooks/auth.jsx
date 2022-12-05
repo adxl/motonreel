@@ -40,13 +40,14 @@ export function AuthProvider({ children }) {
   }, [_token]);
 
   const handleLogin = useCallback((email, password) => {
-    login(email, password)
+    return login(email, password)
       .then(({ data: user }) => {
         setToken(user.token);
         location.href = "/";
       })
       .catch((_) => {
         console.log("error");
+        return false;
       });
   });
 
