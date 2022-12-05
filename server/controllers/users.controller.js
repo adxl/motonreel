@@ -46,19 +46,24 @@ exports.login = async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res.status(400).json({ message: `Missing required fields ${email} ${password}` });
+    return res.status(400).json({ message: `Champs obligatoires manquants ${email} ${password}` });
   }
   
   const user = await Users.findByPk(email);
 
   if (!user) {
-    return res.status(404).json({ message: 'User not found' });
+    return res.status(404).json({
+      message: 'Vos identifiants sont incorrects'
+    });
   }
 
   const same = await bcrypt.compare(password, user.password);
 
   if (!same) {
-    return res.status(401).json({ message: 'Wrong password' });
+    // 404 for reinforced security : not let the user what's the problem exactly
+    return res.status(404).json({
+      message: 'Vos identifiants sont incorrects'
+    });
   }
 
   const token = await jwt.createToken(user);
@@ -75,7 +80,7 @@ exports.login = async (req, res) => {
       return res.status(200).json({ token });
     } else {
       return res.status(500).json({
-        message: `Cannot update User with email=${email}. Maybe User was not found or req.body is empty!`,
+        message: `Impossible de mettre à jour l'utilisateur avec email=${email}. Peut-être que l'utilisateur n'a pas été trouvé ou que req.body est vide.!`,
       });
     }
   });

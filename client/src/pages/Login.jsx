@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
-import Alert from "react-bootstrap/Alert";
 import { Link, Navigate } from "react-router-dom";
 
 import { useAuth } from "@hooks/auth";
@@ -16,7 +16,7 @@ export default function Login() {
   const [_loginInvalid, setLoginInvalid] = useState(false);
 
   useEffect(() => {
-		setLoginInvalid(false);
+    setLoginInvalid(false);
   }, [_passwordInput, _emailInput]);
 
   function handleEmailChange(event) {
@@ -27,13 +27,12 @@ export default function Login() {
     setPasswordInput(event.target.value);
   }
 
-  async function handleLogin(event) {
+  function handleLogin(event) {
     event.preventDefault();
-    const isLogged = await login(_emailInput, _passwordInput);
-    if(!isLogged) {
-      console.log('info incorect');
-      setLoginInvalid(true);
-    }
+    if (!(_emailInput && _passwordInput)) return;
+    login(_emailInput, _passwordInput).then((data) => {
+      setLoginInvalid(data.message);
+    });
   }
 
   if (token) {
@@ -42,7 +41,11 @@ export default function Login() {
 
   return (
     <Container>
-      { _loginInvalid && <Alert key="danger" variant="danger">Vos identifiants sont incorrects</Alert> }
+      {_loginInvalid && (
+        <Alert key="danger" variant="danger">
+          {_loginInvalid}
+        </Alert>
+      )}
       <h1 className="mb-5">Connexion</h1>
       <Form onSubmit={handleLogin}>
         <Row className="mb-5">

@@ -47,7 +47,10 @@ export function AuthProvider({ children }) {
       })
       .catch((_) => {
         console.log("error");
-        return false;
+        return {
+          success: false,
+          message: "Vos identifiants sont incorrects",
+        };
       });
   });
 
