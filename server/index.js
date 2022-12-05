@@ -36,7 +36,9 @@ app.delete('/salons/:id', auth, salons.delete);
 
 // Salon / Message Routes
 
+app.get('/salons/:id/messages', auth, salons.getMessages);
 
+app.post('/salons/:id/messages', auth, salons.postMessage);
 
 /* User Routes */
 
@@ -78,28 +80,6 @@ app.patch('/rendezvous/:id', auth, rendezVous.update);
 
 app.delete('/rendezvous/:id', auth, rendezVous.delete);
 
-/* Salon Routes */
-
-const salon = require('./controllers/salon.controller');
-
-app.get('/salons', auth, salon.findAll);
-
-app.get('/salons/:id', auth, salon.findOne);
-
-app.get('/salons/:id/users', auth, salon.getUsers);
-
-app.post('/salons/create', auth, salon.create);
-
-app.patch('/salons/:id', auth, salon.update);
-
-app.delete('/salons/:id', auth, salon.delete);
-
-// Salon / Message Routes
-
-app.get('/salons/:id/messages', auth, salon.getMessages);
-
-app.post('/salons/:id/messages', auth, salon.createMessage);
-
 /* CommRequest Routes */
 
 const commRequest = require('./controllers/commRequest.controller');
@@ -120,7 +100,7 @@ app.delete('/commRequests/:id', auth, commRequest.delete);
 
 app.get('/commRequests/:id/messages', auth, commRequest.getMessages);
 
-app.post('/commRequests/:id/messages', auth, commRequest.createMessage);
+app.post('/commRequests/:id/messages', auth, commRequest.postMessage);
 
 /* Vehicle Routes */
 
