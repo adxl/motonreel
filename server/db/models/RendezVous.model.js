@@ -2,9 +2,9 @@ module.exports = (sequelize, DataTypes) => {
   
   const RendezVous = sequelize.define('RendezVous', {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
     },
     date: {
       type: DataTypes.DATE,

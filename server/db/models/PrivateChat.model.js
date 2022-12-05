@@ -1,15 +1,11 @@
 module.exports = (sequelize, DataTypes) => {
-  const Message = sequelize.define('Message', {
+  const PrivateChat = sequelize.define('PrivateChat', {
     id: {
       type: DataTypes.UUID,
       primaryKey: true,
       defaultValue: DataTypes.UUIDV4,
     },
-    content: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
   });
 
-  return Message;
+  return PrivateChat;
 };
