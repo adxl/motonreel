@@ -62,6 +62,66 @@ app.post('/users/addSalon', auth, users.addSalon);
 
 app.post('/users/removeSalon', auth, users.removeSalon);
 
+/* RendezVous Routes */
+
+const rendezVous = require('./controllers/rendezVous.controller');
+
+app.get('/rendezvous', auth, rendezVous.findAll);
+
+app.get('/me/rendezvous', auth, rendezVous.findAllByToken);
+
+app.get('/rendezvous/:id', auth, rendezVous.findOne);
+
+app.post('/rendezvous/create', auth, rendezVous.create);
+
+app.patch('/rendezvous/:id', auth, rendezVous.update);
+
+app.delete('/rendezvous/:id', auth, rendezVous.delete);
+
+/* Salon Routes */
+
+const salon = require('./controllers/salon.controller');
+
+app.get('/salons', auth, salon.findAll);
+
+app.get('/salons/:id', auth, salon.findOne);
+
+app.get('/salons/:id/users', auth, salon.getUsers);
+
+app.post('/salons/create', auth, salon.create);
+
+app.patch('/salons/:id', auth, salon.update);
+
+app.delete('/salons/:id', auth, salon.delete);
+
+// Salon / Message Routes
+
+app.get('/salons/:id/messages', auth, salon.getMessages);
+
+app.post('/salons/:id/messages', auth, salon.createMessage);
+
+/* CommRequest Routes */
+
+const commRequest = require('./controllers/commRequest.controller');
+
+app.get('/commRequests', auth, commRequest.findAll);
+
+app.get('/commRequests/:id', auth, commRequest.findOne);
+
+app.get('/me/commRequests', auth, commRequest.findAllByToken);
+
+app.post('/commRequests/create', auth, commRequest.create);
+
+app.patch('/commRequests/:id', auth, commRequest.update);
+
+app.delete('/commRequests/:id', auth, commRequest.delete);
+
+// CommRequest / Message Routes
+
+app.get('/commRequests/:id/messages', auth, commRequest.getMessages);
+
+app.post('/commRequests/:id/messages', auth, commRequest.createMessage);
+
 /* Vehicle Routes */
 
 const vehicles = require('./controllers/vehicles.controller');
