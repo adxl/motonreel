@@ -7,6 +7,12 @@ const Message = db.message;
 // TODO : Apart from Message methods and findAll, check if user is an admin in all the methods
 
 exports.create = async (req, res) => {
+  const reqUser = req.user;
+
+  if (!reqUser.isAdmin) {
+    return res.status(401).json({ message: 'Access denied !' });
+  }
+
   const { name, userSize } = req.body;
 
   if (!name || !userSize) {
@@ -30,7 +36,6 @@ exports.create = async (req, res) => {
 };
 
 exports.findAll = async (req, res) => {
-
   const salons = await Salon.findAll();
   
   if (!salons) {
@@ -56,6 +61,7 @@ exports.findOne = async (req, res) => {
   return res.status(200).json(salon);
 };
 
+// If no user joined the salon, will it return a 404 ?
 exports.getUsers = async (req, res) => {
   const id = req.params.id;
 
@@ -79,6 +85,12 @@ exports.getUsers = async (req, res) => {
 };
 
 exports.update = async (req, res) => {
+  const reqUser = req.user;
+
+  if (!reqUser.isAdmin) {
+    return res.status(401).json({ message: 'Access denied !' });
+  }
+
   const id = req.params.id;
 
   if (!id) {
@@ -113,6 +125,12 @@ exports.update = async (req, res) => {
 };
 
 exports.delete = async (req, res) => {
+  const reqUser = req.user;
+
+  if (!reqUser.isAdmin) {
+    return res.status(401).json({ message: 'Access denied !' });
+  }
+
   const id = req.params.id;
 
   if (!id) {

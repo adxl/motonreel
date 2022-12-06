@@ -1,3 +1,5 @@
+const { Op } = require('sequelize');
+
 const db = require('../db').db;
 const CommRequest = db.commRequest;
 const Users = db.users;
@@ -8,15 +10,13 @@ const Message = db.message;
 
 exports.create = async (req, res) => {
   const { status, advisor } = req.body;
-  const client = req.user.id;
+  const reqUser = req.user;
 
-  if (!status || !client || !advisor) {
+  if (!status || !advisor) {
     return res.status(400).json({ message: 'Missing required fields' });
   }
-  
-  const user = await Users.findByPk(client);
 
-  if (!user || user.isAdmin) {
+  if (reqUser.isAdmin) {
     return res.status(401).json({ message: 'Access denied !' });
   }
   
@@ -32,7 +32,7 @@ exports.create = async (req, res) => {
 
   const commRequest = {
     status: status,
-    client: client,
+    client: reqUser.email,
     advisor: advisor,
   };
 
@@ -48,12 +48,9 @@ exports.create = async (req, res) => {
 };
 
 exports.findAll = async (req, res) => {
+  const reqUser = req.user;
 
-  const reqUser = req.user.id;
-
-  const user = await Users.findByPk(reqUser);
-
-  if (!user || !user.isAdmin) {
+  if (!reqUser.isAdmin) {
     return res.status(401).json({ message: 'Access denied !' });
   }
 
@@ -67,15 +64,7 @@ exports.findAll = async (req, res) => {
 };
 
 exports.findOne = async (req, res) => {
-
-  const reqUser = req.user.id;
-
-  const user = await Users.findByPk(reqUser);
-
-  if (!user) {
-    return res.status(401).json({ message: 'Access denied !' });
-  }
-
+  const reqUser = req.user;
   const id = req.params.id;
 
   if (!id) {
@@ -88,7 +77,7 @@ exports.findOne = async (req, res) => {
     return res.status(404).json({ message: 'CommRequest not found' });
   }
 
-  if (!user.isAdmin && commRequest.client !== reqUser) {
+  if (!reqUser.isAdmin && commRequest.client !== reqUser.email) {
     return res.status(401).json({ message: 'Access denied !' });
   }
 
@@ -96,51 +85,35 @@ exports.findOne = async (req, res) => {
 };
 
 exports.findAllByToken = async (req, res) => {
-  const reqUser = req.user.id;
+  const reqUser = req.user;
 
-  const user = await Users.findByPk(reqUser);
+  const CommRequests = await CommRequest.findAll({
+    where: {
+      [Op.or]: [
+        {
+          client: reqUser.email,
+        },
+        {
+          advisor: reqUser.email,
+        },
+      ],
+    },
+  }).catch((err) => {
+    res.status(500).json({
+      message: err.message || 'Some error occurred while retrieving the CommRequests.',
+    });
+  });
 
-  if (!user) {
-    return res.status(401).json({ message: 'Access denied !' });
+  if (!CommRequests) {
+    return res.status(404).json({ message: 'No CommRequest found' });
   }
 
-  if (user.isAdmin) {
-    const commRequests = await CommRequest.findAll({
-      where: {
-        advisor: reqUser,
-      },
-    }).catch((err) => {
-      res.status(500).json({
-        message: err.message || 'Some error occurred while retrieving the CommRequests.',
-      });
-    });
-
-    if (!commRequests) {
-      return res.status(404).json({ message: 'No commRequests found' });
-    }
-
-    return res.status(200).json(commRequests);
-  } else {
-    const commRequests = await CommRequest.findAll({
-      where: {
-        client: reqUser,
-      },
-    }).catch((err) => {
-      res.status(500).json({
-        message: err.message || 'Some error occurred while retrieving the CommRequests.',
-      });
-    });
-
-    if (!commRequests) {
-      return res.status(404).json({ message: 'No commRequests found' });
-    }
-
-    return res.status(200).json(commRequests);
-  }
+  return res.status(200).json(CommRequests);
 };
 
 exports.update = async (req, res) => {
   const id = req.params.id;
+  const reqUser = req.user;
 
   if (!id) {
     return res.status(400).json({ message: 'Missing required fields' });
@@ -150,6 +123,10 @@ exports.update = async (req, res) => {
 
   if (!commRequest) {
     return res.status(404).json({ message: 'CommRequest not found' });
+  }
+
+  if (!reqUser.isAdmin && commRequest.client !== reqUser.email) {
+    return res.status(401).json({ message: 'Access denied !' });
   }
 
   await CommRequest.update(req.body, {
@@ -169,6 +146,7 @@ exports.update = async (req, res) => {
 };
 
 exports.delete = async (req, res) => {
+  const reqUser = req.user;
   const id = req.params.id;
 
   if (!id) {
@@ -179,6 +157,10 @@ exports.delete = async (req, res) => {
 
   if (!commRequest) {
     return res.status(404).json({ message: 'CommRequest not found' });
+  }
+
+  if (!reqUser.isAdmin && commRequest.client !== reqUser.email) {
+    return res.status(401).json({ message: 'Access denied !' });
   }
 
   await CommRequest.destroy({

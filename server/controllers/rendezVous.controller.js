@@ -1,21 +1,12 @@
 const db = require('../db').db;
 const RendezVous = db.rendezVous;
-const Users = db.users;
 const RendezVousType = db.rendezVousType;
 
 // TODO : Check if user exists in all the methods
 // TODO : Apart from create, check if the user is the client of the rendezVous
 
 exports.create = async (req, res) => {
-
-  const reqUser = req.user.id;
-
-  const user = await Users.findByPk(reqUser);
-
-  if (!user) {
-    return res.status(401).json({ message: 'Access denied !' });
-  }
-  
+  const reqUser = req.user;  
   const { type, date } = req.body;
 
   if (!type || !date) {
@@ -31,7 +22,7 @@ exports.create = async (req, res) => {
   const rendezVous = {
     type: type,
     date: date,
-    client: reqUser,
+    client: reqUser.email,
   };
 
   await RendezVous.create(rendezVous)
@@ -46,12 +37,9 @@ exports.create = async (req, res) => {
 };
 
 exports.findAll = async (req, res) => {
+  const reqUser = req.user;
 
-  const reqUser = req.user.id;
-
-  const user = await Users.findByPk(reqUser);
-
-  if (!user || !user.isAdmin) {
+  if (!reqUser.isAdmin) {
     return res.status(401).json({ message: 'Access denied !' });
   }
 
@@ -65,15 +53,7 @@ exports.findAll = async (req, res) => {
 };
 
 exports.findOne = async (req, res) => {
-
-  const reqUser = req.user.id;
-
-  const user = await Users.findByPk(reqUser);
-
-  if (!user) {
-    return res.status(401).json({ message: 'Access denied !' });
-  }
-
+  const reqUser = req.user;
   const id = req.params.id;
 
   if (!id) {
@@ -86,7 +66,7 @@ exports.findOne = async (req, res) => {
     return res.status(404).json({ message: 'RendezVous not found' });
   }
 
-  if (rendezVous.client !== reqUser && !user.isAdmin) {
+  if (rendezVous.client !== reqUser.email && !reqUser.isAdmin) {
     return res.status(401).json({ message: 'Access denied !' });
   }
 
@@ -94,16 +74,14 @@ exports.findOne = async (req, res) => {
 };
 
 exports.findAllByToken = async (req, res) => {
-  const reqUser = req.user.id;
+  const reqUser = req.user;
 
-  const user = await Users.findByPk(reqUser);
-
-  if (!user || user.isAdmin) {
+  if (reqUser.isAdmin) {
     return res.status(401).json({ message: 'Access denied !' });
   }
 
   const rendezVous = await RendezVous.findAll({
-    where: { client: reqUser },
+    where: { client: reqUser.email },
   });
 
   if (!rendezVous) {
@@ -114,14 +92,7 @@ exports.findAllByToken = async (req, res) => {
 };
 
 exports.update = async (req, res) => {
-
-  const reqUser = req.user.id;
-
-  const user = await Users.findByPk(reqUser);
-
-  if (!user || !user.isAdmin) {
-    return res.status(401).json({ message: 'Access denied !' });
-  }
+  const reqUser = req.user;
 
   const id = req.params.id;
 
@@ -133,6 +104,10 @@ exports.update = async (req, res) => {
 
   if (!rendezVous) {
     return res.status(404).json({ message: 'RendezVous not found' });
+  }
+
+  if (rendezVous.client !== reqUser.email && !reqUser.isAdmin) {
+    return res.status(401).json({ message: 'Access denied !' });
   }
 
   await RendezVous.update(req.body, {
@@ -157,15 +132,7 @@ exports.update = async (req, res) => {
 };
 
 exports.delete = async (req, res) => {
-
-  const reqUser = req.user.id;
-
-  const user = await Users.findByPk(reqUser);
-
-  if (!user) {
-    return res.status(401).json({ message: 'Access denied !' });
-  }
-
+  const reqUser = req.user;
   const id = req.params.id;
 
   if (!id) {
@@ -178,7 +145,7 @@ exports.delete = async (req, res) => {
     return res.status(404).json({ message: 'RendezVous not found' });
   }
 
-  if (rendezVous.client !== reqUser && !user.isAdmin) {
+  if (rendezVous.client !== reqUser.email && !reqUser.isAdmin) {
     return res.status(401).json({ message: 'Access denied !' });
   }
 

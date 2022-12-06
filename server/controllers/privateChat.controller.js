@@ -5,43 +5,35 @@ const PrivateChat = db.privateChat;
 const Users = db.users;
 
 exports.create = async (req, res) => {
-  const firUserId = req.user.id;
+  const reqUser = req.user;
   const secUserId = req.body.secUser;
 
-  if (!firUserId || !secUserId) {
+  if (!secUserId) {
     return res.status(400).json({ message: 'Missing required fields' });
   }
 
-  const firUser = await Users.findByPk(firUserId);
   const secUser = await Users.findByPk(secUserId);
 
-  if (!firUser || !secUser) {
+  if (!secUser) {
     return res.status(404).json({ message: 'User not found' });
   }
 
   const privateChat = await PrivateChat.create({
-    firUser: firUserId,
+    firUser: reqUser.email,
     secUser: secUserId,
   });
 
   return res.status(201).json(privateChat);
-
 };
 
 exports.findAllByToken = async (req, res) => {
-  const reqUser = req.user.id;
-
-  const user = await Users.findByPk(reqUser);
-
-  if (!user) {
-    return res.status(401).json({ message: 'Access denied !' });
-  }
+  const reqUser = req.user;
 
   const privateChat = await PrivateChat.findAll({
     where: {
       [Op.or]: [
-        { firUser: reqUser },
-        { secUser: reqUser },
+        { firUser: reqUser.email },
+        { secUser: reqUser.email },
       ],
     },
   });
@@ -54,12 +46,7 @@ exports.findAllByToken = async (req, res) => {
 };
 
 exports.findOne = async (req, res) => {
-  const reqUser = req.user.id;
-
-  if (!reqUser) {
-    return res.status(401).json({ message: 'Access denied !' });
-  }
-
+  const reqUser = req.user;
   const id = req.params.id;
 
   if (!id) {
@@ -72,10 +59,10 @@ exports.findOne = async (req, res) => {
         id: id,
         [Op.or]: [
           {
-            firUser: reqUser,
+            firUser: reqUser.email,
           },
           {
-            secUser: reqUser,
+            secUser: reqUser.email,
           },
         ],
       },

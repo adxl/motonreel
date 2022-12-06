@@ -86,32 +86,16 @@ exports.login = async (req, res) => {
 };
 
 exports.findOneByToken = async (req, res) => {
-  const token = req.headers.authorization.split(" ")[1];
-
-  if (!token) {
-    return res.status(400).json({ message: "Missing required fields" });
-  }
-
-  const user = await Users.findOne({
-    where: {
-      token,
-    },
-  });
-
-  if (!user) {
-    return res.status(404).json({ message: "User not found" });
-  }
+  const user = req.user;
 
   return res.status(200).json(user);
 };
 
 exports.findAll = async (req, res) => {
-  const reqUser = req.user.id;
+  const reqUser = req.user;
 
-  const user = await Users.findByPk(reqUser);
-
-  if (!user || !user.isAdmin) {
-    return res.status(401).json({ message: "Access denied !" });
+  if (!reqUser.isAdmin) {
+    return res.status(401).json({ message: 'Access denied !' });
   }
 
   const users = await Users.findAll();
@@ -124,18 +108,14 @@ exports.findAll = async (req, res) => {
 };
 
 exports.findOne = async (req, res) => {
-  const reqUser = req.user.id;
-
-  const user = await Users.findByPk(reqUser);
-
-  if (!user) {
-    return res.status(401).json({ message: "Access denied !" });
-  }
+  const reqUser = req.user;
 
   const email = req.body.email;
 
-  if (!user.isAdmin) {
-    return res.status(200).json(user);
+  if (!reqUser.isAdmin) {
+
+    return res.status(200).json(reqUser);
+
   } else {
     if (!email) {
       return res.status(400).json({ message: "Missing required fields" });
@@ -152,57 +132,31 @@ exports.findOne = async (req, res) => {
 };
 
 exports.update = async (req, res) => {
-  // User can only update himself
-
-  const email = req.user.id;
-
-  if (!email) {
-    return res.status(400).json({ message: "Missing required fields" });
-  }
-
-  const user = await Users.findByPk(email);
-
-  if (!user) {
-    return res.status(404).json({ message: "User not found" });
-  }
+  const reqUser = req.user;
 
   await Users.update(req.body, {
-    where: { email: user.email },
-  }).then((num) => {
-    if (num == 1) {
-      res.status(200).json({
-        message: "User was updated successfully.",
-      });
-    } else {
-      res.status(500).json({
-        message:
-          "Cannot update User. Maybe User was not found or req.body is empty!",
-      });
-    }
-  });
+    where: { email: reqUser.email },
+  })
+    .then((num) => {
+      if (num == 1) {
+        res.status(200).json({
+          message: 'User was updated successfully.',
+        });
+      } else {
+        res.status(500).json({
+          message: 'Cannot update User. Maybe User was not found or req.body is empty!',
+        });
+      }
+    });
 };
 
 // QUESTION : Hard or soft delete ?
 
 exports.delete = async (req, res) => {
-  // User can only delete himself
-
-  const email = req.user.id;
-
-  if (!email) {
-    return res.status(400).json({ message: "Missing required fields" });
-  }
-
-  const user = await Users.findByPk(email);
-
-  if (!user) {
-    return res
-      .status(404)
-      .json({ message: "User not found or already deleted" });
-  }
+  const reqUser = req.user;
 
   await Users.destroy({
-    where: { email: user.email },
+    where: { email: reqUser.email },
   })
     .then((num) => {
       if (num == 1) {
@@ -220,22 +174,18 @@ exports.delete = async (req, res) => {
         message: "Could not delete User",
       });
     });
+
+  //Destroy session
 };
 
 /* Salon relation */
 
 exports.addSalon = async (req, res) => {
-  const email = req.user.id;
+  const reqUser = req.user;
   const salonId = req.body;
 
   if (!salonId) {
     return res.status(400).json({ message: "Missing required fields." });
-  }
-
-  const user = await Users.findByPk(email);
-
-  if (!user) {
-    return res.status(404).json({ message: "User not found" });
   }
 
   const salon = await Salon.findByPk(salonId);
@@ -250,10 +200,9 @@ exports.addSalon = async (req, res) => {
     return res.status(400).json({ message: "Salon is full" });
   }
 
-  await user
-    .addSalon(salon, {
-      through: { joined: new Date() },
-    })
+  await reqUser.addSalon(salon, {
+    through: { joined: new Date() },
+  })
     .then((data) => {
       return res.status(201).json(data);
     })
@@ -265,17 +214,11 @@ exports.addSalon = async (req, res) => {
 };
 
 exports.removeSalon = async (req, res) => {
-  const email = req.user.id;
+  const reqUser = req.user;
   const salonId = req.body;
 
   if (!salonId) {
     return res.status(400).json({ message: "Missing required fields." });
-  }
-
-  const user = await Users.findByPk(email);
-
-  if (!user) {
-    return res.status(404).json({ message: "User not found" });
   }
 
   const salon = await Salon.findByPk(salonId);
@@ -284,8 +227,7 @@ exports.removeSalon = async (req, res) => {
     return res.status(404).json({ message: "Salon not found" });
   }
 
-  await user
-    .removeSalon(salon)
+  await reqUser.removeSalon(salon)
     .then(() => {
       return res.status(200).json({ message: "Salon removed from user" });
     })
