@@ -104,6 +104,11 @@ exports.findAll = async (req, res) => {
     return res.status(404).json({ message: "No users found" });
   }
 
+  for (let user in users) {
+    delete user.password;
+    delete user.token;
+  }
+
   return res.status(200).json(users);
 };
 
@@ -128,12 +133,19 @@ exports.findOne = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    delete user.password;
+    delete user.token;
+
     return res.status(200).json(user);
   }
 };
 
 exports.update = async (req, res) => {
   const reqUser = req.user;
+  const body = req.body;
+
+  delete body.email;
+  delete body.isAdmin;
 
   await Users.update(req.body, {
     where: { id: reqUser.id },
