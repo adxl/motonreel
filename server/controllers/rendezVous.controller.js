@@ -22,7 +22,7 @@ exports.create = async (req, res) => {
   const rendezVous = {
     type: type,
     date: date,
-    client: reqUser.email,
+    client: reqUser.id,
   };
 
   await RendezVous.create(rendezVous)
@@ -66,7 +66,7 @@ exports.findOne = async (req, res) => {
     return res.status(404).json({ message: 'RendezVous not found' });
   }
 
-  if (rendezVous.client !== reqUser.email && !reqUser.isAdmin) {
+  if (rendezVous.client !== reqUser.id && !reqUser.isAdmin) {
     return res.status(401).json({ message: 'Access denied !' });
   }
 
@@ -81,7 +81,7 @@ exports.findAllByToken = async (req, res) => {
   }
 
   const rendezVous = await RendezVous.findAll({
-    where: { client: reqUser.email },
+    where: { client: reqUser.id },
   });
 
   if (!rendezVous) {
@@ -106,7 +106,7 @@ exports.update = async (req, res) => {
     return res.status(404).json({ message: 'RendezVous not found' });
   }
 
-  if (rendezVous.client !== reqUser.email && !reqUser.isAdmin) {
+  if (rendezVous.client !== reqUser.id && !reqUser.isAdmin) {
     return res.status(401).json({ message: 'Access denied !' });
   }
 
@@ -145,7 +145,7 @@ exports.delete = async (req, res) => {
     return res.status(404).json({ message: 'RendezVous not found' });
   }
 
-  if (rendezVous.client !== reqUser.email && !reqUser.isAdmin) {
+  if (rendezVous.client !== reqUser.id && !reqUser.isAdmin) {
     return res.status(401).json({ message: 'Access denied !' });
   }
 

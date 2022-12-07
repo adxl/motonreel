@@ -48,8 +48,8 @@ exports.login = async (req, res) => {
       .status(400)
       .json({ message: `Champs obligatoires manquants ${email} ${password}` });
   }
-
-  const user = await Users.findByPk(email);
+  
+  const user = await Users.findOne({ where: { email: email } });
 
   if (!user) {
     return res.status(401).json({
@@ -71,7 +71,7 @@ exports.login = async (req, res) => {
     { token: token },
     {
       where: {
-        email: email,
+        id: user.id,
       },
     }
   ).then((num) => {
@@ -110,19 +110,20 @@ exports.findAll = async (req, res) => {
 exports.findOne = async (req, res) => {
   const reqUser = req.user;
 
-  const email = req.body.email;
+  const userId = req.body.id;
 
   if (!reqUser.isAdmin) {
 
     return res.status(200).json(reqUser);
 
   } else {
-    if (!email) {
-      return res.status(400).json({ message: "Missing required fields" });
+
+    if (!userId) {
+      return res.status(400).json({ message: 'Missing required fields' });
     }
-
-    const user = await Users.findByPk(email);
-
+  
+    const user = await Users.findByPk(userId);
+  
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -135,7 +136,7 @@ exports.update = async (req, res) => {
   const reqUser = req.user;
 
   await Users.update(req.body, {
-    where: { email: reqUser.email },
+    where: { id: reqUser.id },
   })
     .then((num) => {
       if (num == 1) {
@@ -156,7 +157,7 @@ exports.delete = async (req, res) => {
   const reqUser = req.user;
 
   await Users.destroy({
-    where: { email: reqUser.email },
+    where: { id: reqUser.id },
   })
     .then((num) => {
       if (num == 1) {
