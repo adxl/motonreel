@@ -13,10 +13,10 @@ export default function Login() {
 
   const [_emailInput, setEmailInput] = useState("");
   const [_passwordInput, setPasswordInput] = useState("");
-  const [_loginInvalid, setLoginInvalid] = useState(false);
+  const [_errorMessage, setErrorMessage] = useState();
 
   useEffect(() => {
-    setLoginInvalid(false);
+    setErrorMessage(null);
   }, [_passwordInput, _emailInput]);
 
   function handleEmailChange(event) {
@@ -30,8 +30,9 @@ export default function Login() {
   function handleLogin(event) {
     event.preventDefault();
     if (!(_emailInput && _passwordInput)) return;
-    login(_emailInput, _passwordInput).then((data) => {
-      setLoginInvalid(data.message);
+
+    login(_emailInput, _passwordInput).catch((error) => {
+      setErrorMessage(error.message);
     });
   }
 
@@ -41,12 +42,8 @@ export default function Login() {
 
   return (
     <Container>
-      {_loginInvalid && (
-        <Alert key="danger" variant="danger">
-          {_loginInvalid}
-        </Alert>
-      )}
       <h1 className="mb-5">Connexion</h1>
+      {_errorMessage && <Alert variant="danger">{_errorMessage}</Alert>}
       <Form onSubmit={handleLogin}>
         <Row className="mb-5">
           <Form.Group className="mb-3">

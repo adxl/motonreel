@@ -37,7 +37,7 @@ export default function App() {
   return (
     <div id="app">
       <AuthProvider>
-        <Suspense fallback={"loading..."}>
+        <Suspense fallback={"Chargement..."}>
           <Router>
             <Routes>
               <Route path="/" element={<Navigate to="/requests" />} />

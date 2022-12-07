@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
@@ -9,12 +10,18 @@ import { register } from "@api/auth";
 import { useAuth } from "@hooks/auth";
 
 export default function Register() {
-  const { token } = useAuth();
+  const { token, setToken } = useAuth();
 
   const [_nameInput, setNameInput] = useState("");
   const [_emailInput, setEmailInput] = useState("");
   const [_passwordInput, setPasswordInput] = useState("");
   const [_secondPasswordInput, setSecondPasswordInput] = useState("");
+
+  const [_errorMessage, setErrorMessage] = useState();
+
+  useEffect(() => {
+    setErrorMessage(null);
+  }, [_nameInput, _emailInput, _passwordInput, _secondPasswordInput]);
 
   function handleNameChange(event) {
     setNameInput(event.target.value);
@@ -36,15 +43,23 @@ export default function Register() {
     if (_passwordInput !== _secondPasswordInput) {
       return;
     }
-    register(_nameInput, _emailInput, _passwordInput);
+    register(_nameInput, _emailInput, _passwordInput)
+      .then(({ data }) => {
+        setToken(data.token);
+      })
+      .catch((error) => {
+        setErrorMessage(error.response.data.message);
+      });
   }
 
   if (token) {
     return <Navigate to="/" />;
   }
+
   return (
     <Container>
       <h1 className="mb-5">Inscription</h1>
+      {_errorMessage && <Alert variant="danger">{_errorMessage}</Alert>}
       <Form onSubmit={handleRegister}>
         <Row className="mb-5">
           <Form.Group className="mb-3">
