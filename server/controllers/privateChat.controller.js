@@ -19,7 +19,7 @@ exports.create = async (req, res) => {
   }
 
   const privateChat = await PrivateChat.create({
-    firUser: reqUser.email,
+    firUser: reqUser.id,
     secUser: secUserId,
   });
 
@@ -32,8 +32,8 @@ exports.findAllByToken = async (req, res) => {
   const privateChat = await PrivateChat.findAll({
     where: {
       [Op.or]: [
-        { firUser: reqUser.email },
-        { secUser: reqUser.email },
+        { firUser: reqUser.id },
+        { secUser: reqUser.id },
       ],
     },
   });
@@ -59,10 +59,10 @@ exports.findOne = async (req, res) => {
         id: id,
         [Op.or]: [
           {
-            firUser: reqUser.email,
+            firUser: reqUser.id,
           },
           {
-            secUser: reqUser.email,
+            secUser: reqUser.id,
           },
         ],
       },

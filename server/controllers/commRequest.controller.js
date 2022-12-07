@@ -32,7 +32,7 @@ exports.create = async (req, res) => {
 
   const commRequest = {
     status: status,
-    client: reqUser.email,
+    client: reqUser.id,
     advisor: advisor,
   };
 
@@ -77,7 +77,7 @@ exports.findOne = async (req, res) => {
     return res.status(404).json({ message: 'CommRequest not found' });
   }
 
-  if (!reqUser.isAdmin && commRequest.client !== reqUser.email) {
+  if (!reqUser.isAdmin && commRequest.client !== reqUser.id) {
     return res.status(401).json({ message: 'Access denied !' });
   }
 
@@ -91,10 +91,10 @@ exports.findAllByToken = async (req, res) => {
     where: {
       [Op.or]: [
         {
-          client: reqUser.email,
+          client: reqUser.id,
         },
         {
-          advisor: reqUser.email,
+          advisor: reqUser.id,
         },
       ],
     },
@@ -125,7 +125,7 @@ exports.update = async (req, res) => {
     return res.status(404).json({ message: 'CommRequest not found' });
   }
 
-  if (!reqUser.isAdmin && commRequest.client !== reqUser.email) {
+  if (!reqUser.isAdmin && commRequest.client !== reqUser.id) {
     return res.status(401).json({ message: 'Access denied !' });
   }
 
@@ -159,7 +159,7 @@ exports.delete = async (req, res) => {
     return res.status(404).json({ message: 'CommRequest not found' });
   }
 
-  if (!reqUser.isAdmin && commRequest.client !== reqUser.email) {
+  if (!reqUser.isAdmin && commRequest.client !== reqUser.id) {
     return res.status(401).json({ message: 'Access denied !' });
   }
 
