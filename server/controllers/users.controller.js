@@ -112,6 +112,16 @@ exports.findAll = async (req, res) => {
   return res.status(200).json(users);
 };
 
+exports.findAdvisors = async (req, res) => {
+  const advisors = await Users.findAll({ where: { isAdmin: true } });
+
+  if (!advisors) {
+    return res.status(404).json({ message: 'No advisors found' });
+  }
+
+  return res.status(200).json(advisors);
+};
+
 exports.findOne = async (req, res) => {
   const reqUser = req.user;
 

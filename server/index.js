@@ -54,6 +54,8 @@ app.get('/users', auth, users.findAll);
 
 app.get('/users/:id', auth, users.findOne);
 
+app.get('/advisors', auth, users.findAdvisors);
+
 app.patch('/users/:id', auth, users.update);
 
 app.delete('/users/:id', auth, users.delete);
