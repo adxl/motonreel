@@ -114,8 +114,6 @@ db.users.hasMany(db.rendezVous, {
   },
 });
 
-db.vehicles = require('./models/Vehicles.model')(connection, DataTypes);
-
 /* Database Initialization */
 
 const initDatabase = async () => {
