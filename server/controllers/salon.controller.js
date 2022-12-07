@@ -81,6 +81,13 @@ exports.getUsers = async (req, res) => {
     return res.status(404).json({ message: 'No users found' });
   }
 
+  console.log(users);
+
+  for (let user in users) {
+    delete user.password;
+    delete user.token;
+  }
+
   return res.status(200).json(users);
 };
 
