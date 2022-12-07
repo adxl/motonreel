@@ -39,11 +39,9 @@ exports.create = async (req, res) => {
 exports.findAll = async (req, res) => {
   const reqUser = req.user;
 
-  if (!reqUser.isAdmin) {
-    return res.status(401).json({ message: 'Access denied !' });
-  }
-
-  const rendezVous = await RendezVous.findAll();
+  const rendezVous = await RendezVous.findAll({
+    where: { client: reqUser.id },
+  });
 
   if (!rendezVous) {
     return res.status(404).json({ message: 'No rendezVous found' });
@@ -68,24 +66,6 @@ exports.findOne = async (req, res) => {
 
   if (rendezVous.client !== reqUser.id && !reqUser.isAdmin) {
     return res.status(401).json({ message: 'Access denied !' });
-  }
-
-  return res.status(200).json(rendezVous);
-};
-
-exports.findAllByToken = async (req, res) => {
-  const reqUser = req.user;
-
-  if (reqUser.isAdmin) {
-    return res.status(401).json({ message: 'Access denied !' });
-  }
-
-  const rendezVous = await RendezVous.findAll({
-    where: { client: reqUser.id },
-  });
-
-  if (!rendezVous) {
-    return res.status(404).json({ message: 'RendezVous not found' });
   }
 
   return res.status(200).json(rendezVous);

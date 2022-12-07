@@ -1,5 +1,3 @@
-const { Op } = require('sequelize');
-
 const db = require('../db').db;
 const CommRequest = db.commRequest;
 const Users = db.users;
@@ -51,16 +49,28 @@ exports.findAll = async (req, res) => {
   const reqUser = req.user;
 
   if (!reqUser.isAdmin) {
-    return res.status(401).json({ message: 'Access denied !' });
+    const commRequests = await CommRequest.findAll({
+      where: { client: reqUser.id },
+    }).catch((err) => {
+      return res.status(500).json({
+        message: err.message || 'Some error occurred while retrieving the CommRequests.',
+      });
+    });
+
+    if (!commRequests) {
+      return res.status(404).json({ message: 'No CommRequest found' });
+    }
+
+    return res.status(200).json(commRequests);
   }
 
-  const commRequest = await CommRequest.findAll();
+  const commRequests = await CommRequest.findAll();
 
-  if (!commRequest) {
+  if (!commRequests) {
     return res.status(404).json({ message: 'No commRequest found' });
   }
 
-  return res.status(200).json(commRequest);
+  return res.status(200).json(commRequests);
 };
 
 exports.findOne = async (req, res) => {
@@ -82,33 +92,6 @@ exports.findOne = async (req, res) => {
   }
 
   return res.status(200).json(commRequest);
-};
-
-exports.findAllByToken = async (req, res) => {
-  const reqUser = req.user;
-
-  const CommRequests = await CommRequest.findAll({
-    where: {
-      [Op.or]: [
-        {
-          client: reqUser.id,
-        },
-        {
-          advisor: reqUser.id,
-        },
-      ],
-    },
-  }).catch((err) => {
-    res.status(500).json({
-      message: err.message || 'Some error occurred while retrieving the CommRequests.',
-    });
-  });
-
-  if (!CommRequests) {
-    return res.status(404).json({ message: 'No CommRequest found' });
-  }
-
-  return res.status(200).json(CommRequests);
 };
 
 exports.update = async (req, res) => {

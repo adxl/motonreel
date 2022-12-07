@@ -70,8 +70,6 @@ const rendezVous = require('./controllers/rendezVous.controller');
 
 app.get('/rendezvous', auth, rendezVous.findAll);
 
-app.get('/me/rendezvous', auth, rendezVous.findAllByToken);
-
 app.get('/rendezvous/:id', auth, rendezVous.findOne);
 
 app.post('/rendezvous/create', auth, rendezVous.create);
@@ -87,8 +85,6 @@ const commRequest = require('./controllers/commRequest.controller');
 app.get('/commRequests', auth, commRequest.findAll);
 
 app.get('/commRequests/:id', auth, commRequest.findOne);
-
-app.get('/me/commRequests', auth, commRequest.findAllByToken);
 
 app.post('/commRequests/create', auth, commRequest.create);
 
