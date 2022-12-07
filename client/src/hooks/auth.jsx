@@ -39,16 +39,18 @@ export function AuthProvider({ children }) {
     refreshUser();
   }, [_token]);
 
-  const handleLogin = useCallback((email, password) => {
-    login(email, password)
-      .then(({ data: user }) => {
-        setToken(user.token);
-        location.href = "/";
-      })
-      .catch((_) => {
-        console.log("error");
-      });
-  });
+  function handleLogin(email, password) {
+    return new Promise((_, reject) => {
+      login(email, password)
+        .then(({ data: user }) => {
+          setToken(user.token);
+          location.href = "/";
+        })
+        .catch((error) => {
+          reject(error.response.data);
+        });
+    });
+  }
 
   const handleLogout = useCallback(() => {
     setToken(null);
@@ -58,6 +60,7 @@ export function AuthProvider({ children }) {
   const value = useMemo(
     () => ({
       token: _token,
+      setToken: setToken,
       user: _user,
       login: handleLogin,
       logout: handleLogout,

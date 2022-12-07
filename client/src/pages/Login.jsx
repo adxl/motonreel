@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
@@ -12,6 +13,11 @@ export default function Login() {
 
   const [_emailInput, setEmailInput] = useState("");
   const [_passwordInput, setPasswordInput] = useState("");
+  const [_errorMessage, setErrorMessage] = useState();
+
+  useEffect(() => {
+    setErrorMessage(null);
+  }, [_passwordInput, _emailInput]);
 
   function handleEmailChange(event) {
     setEmailInput(event.target.value);
@@ -23,7 +29,11 @@ export default function Login() {
 
   function handleLogin(event) {
     event.preventDefault();
-    login(_emailInput, _passwordInput);
+    if (!(_emailInput && _passwordInput)) return;
+
+    login(_emailInput, _passwordInput).catch((error) => {
+      setErrorMessage(error.message);
+    });
   }
 
   if (token) {
@@ -33,6 +43,7 @@ export default function Login() {
   return (
     <Container>
       <h1 className="mb-5">Connexion</h1>
+      {_errorMessage && <Alert variant="danger">{_errorMessage}</Alert>}
       <Form onSubmit={handleLogin}>
         <Row className="mb-5">
           <Form.Group className="mb-3">
