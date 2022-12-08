@@ -43,8 +43,13 @@ exports.findAll = async (req, res) => {
 
   if (!reqUser.isAdmin) {
     const rendezVous = await RendezVous.findAll({
-      where: { client: reqUser.id },
-    });
+      where: {
+        [Op.and]: [
+          { client: reqUser.id },
+          { date: { [Op.gte]: new Date() }}
+        ],
+    }
+  });
   
     return res.status(200).json(rendezVous);
   }

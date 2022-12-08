@@ -96,7 +96,7 @@ exports.update = async (req, res) => {
     return res.status(404).json({ message: 'CommRequest not found' });
   }
 
-  if ((!reqUser.isAdmin && commRequest.client !== reqUser.id) || (reqUser.isAdmin && commRequest.advisor !== reqUser.id)) {
+  if (!reqUser.isAdmin || (reqUser.isAdmin && commRequest.advisor !== reqUser.id)) {
     return res.status(401).json({ message: 'Access denied !' });
   }
 
