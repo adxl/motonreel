@@ -24,6 +24,11 @@ export function _post(path, body, token) {
   return axios.post(URL + path, body, { headers });
 }
 
+export function _patch(path, body, token) {
+  const headers = get_headers(token);
+  return axios.patch(URL + path, body, { headers });
+}
+
 export function _delete(path, token) {
   const headers = get_headers(token);
   return axios.get(URL + path, { headers });

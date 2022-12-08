@@ -3,13 +3,14 @@ import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import { Link } from "react-router-dom";
 
+import { update } from "@api/advisors";
 import { useAuth } from "@hooks/auth";
 
 export default function AdminRequests() {
-  const { user } = useAuth();
+  const { user, token, refreshUser } = useAuth();
 
   function handleChangeDisponibility() {
-    alert("marche pas lol");
+    update(user.id, !user.disponibility, token).then(() => refreshUser());
   }
 
   function formatDisponibility(disponibility) {

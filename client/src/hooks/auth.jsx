@@ -64,6 +64,7 @@ export function AuthProvider({ children }) {
       user: _user,
       login: handleLogin,
       logout: handleLogout,
+      refreshUser: refreshUser,
     }),
     [_token, _user]
   );
