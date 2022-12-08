@@ -76,6 +76,8 @@ db.privateChat.belongsToMany(db.message, {
   through: db.privateChatMessage,
 });
 
+db.commRequestType = require('./models/CommRequestType.model')(connection, DataTypes);
+
 db.commRequest = require('./models/CommRequest.model')(connection, DataTypes);
 db.users.hasMany(db.commRequest, {
   foreignKey: {
@@ -86,6 +88,12 @@ db.users.hasMany(db.commRequest, {
 db.users.hasMany(db.commRequest, {
   foreignKey: {
     name: 'advisor',
+    allowNull: false,
+  },
+});
+db.commRequestType.hasMany(db.commRequest, {
+  foreignKey: {
+    name: 'status',
     allowNull: false,
   },
 });

@@ -5,11 +5,6 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       defaultValue: DataTypes.UUIDV4,
     },
-    status: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 0,
-    },
   });
 
   return CommRequest;

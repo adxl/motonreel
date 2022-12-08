@@ -38,10 +38,6 @@ exports.findAllByToken = async (req, res) => {
     },
   });
 
-  if (!privateChat) {
-    return res.status(404).json({ message: 'No privateChat found' });
-  }
-
   return res.status(200).json(privateChat);
 };
 
@@ -77,5 +73,7 @@ exports.findOne = async (req, res) => {
     return res.status(404).json({ message: 'PrivateChat not found' });
   }
 
-  return res.status(200).json(privateChat);
+  const messages = await privateChat.getMessages();
+
+  return res.status(200).json(messages);
 };

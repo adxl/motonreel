@@ -88,76 +88,30 @@ exports.login = async (req, res) => {
 exports.findOneByToken = async (req, res) => {
   const user = req.user;
 
+  delete user.password;
+  delete user.token;
+
   return res.status(200).json(user);
 };
 
-exports.findAll = async (req, res) => {
+exports.findAdvisors = async (req, res) => {
   const reqUser = req.user;
 
   if (!reqUser.isAdmin) {
-    return res.status(401).json({ message: 'Access denied !' });
+    const advisors = await Users.findAll({ where: { isAdmin: true, disponibility: true } });
+
+    return res.status(200).json(advisors);
   }
 
-  const users = await Users.findAll();
-
-  if (!users) {
-    return res.status(404).json({ message: "No users found" });
-  }
-
-  for (let user in users) {
-    delete user.password;
-    delete user.token;
-  }
-
-  return res.status(200).json(users);
-};
-
-exports.findAdvisors = async (req, res) => {
   const advisors = await Users.findAll({ where: { isAdmin: true } });
-
-  if (!advisors) {
-    return res.status(404).json({ message: 'No advisors found' });
-  }
 
   return res.status(200).json(advisors);
 };
 
-exports.findOne = async (req, res) => {
-  const reqUser = req.user;
-
-  const userId = req.body.id;
-
-  if (!reqUser.isAdmin) {
-
-    return res.status(200).json(reqUser);
-
-  } else {
-
-    if (!userId) {
-      return res.status(400).json({ message: 'Missing required fields' });
-    }
-  
-    const user = await Users.findByPk(userId);
-  
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    delete user.password;
-    delete user.token;
-
-    return res.status(200).json(user);
-  }
-};
-
 exports.update = async (req, res) => {
   const reqUser = req.user;
-  const body = req.body;
 
-  delete body.email;
-  delete body.isAdmin;
-
-  await Users.update(req.body, {
+  await Users.update({disponibility: req.body.disponibility}, {
     where: { id: reqUser.id },
   })
     .then((num) => {
