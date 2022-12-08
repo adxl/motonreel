@@ -1,12 +1,22 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
+import Table from "react-bootstrap/Table";
 import { Link } from "react-router-dom";
 
+import { getAdvisors } from "@api/advisors";
 import { useAuth } from "@hooks/auth";
 
 export default function AdminRequests() {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
+
+  const [_advisors, setAdvisors] = useState([]);
+
+  useEffect(() => {
+    getAdvisors(token).then(({ data: advisors }) => {
+      setAdvisors(advisors);
+    });
+  }, []);
 
   function handleChangeDisponibility() {
     alert("marche pas lol");
@@ -19,29 +29,22 @@ export default function AdminRequests() {
   return (
     <Container>
       <h2>Conseillers</h2>
-      <table className="mb-3">
+      <Table striped bordered hover>
         <thead>
           <tr>
-            <th>Nom</th>
-            <th>Status</th>
+            <th>Prénom</th>
+            <th>Disponibilité</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>John </td>
-            <td>Oui</td>
-          </tr>
-
-          <tr>
-            <td>Marie </td>
-            <td>Oui</td>
-          </tr>
-          <tr>
-            <td>Carl</td>
-            <td>Non</td>
-          </tr>
+          {_advisors.map((advisor) => (
+            <tr key={advisor.id}>
+              <td className="text-capitalize">{advisor.name} </td>
+              <td>{formatDisponibility(advisor.disponibility)}</td>
+            </tr>
+          ))}
         </tbody>
-      </table>
+      </Table>
       <div className="d-flex align-items-center">
         <p className="m-0">
           Mon status : {formatDisponibility(user.disponibility)}
