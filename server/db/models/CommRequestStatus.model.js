@@ -1,10 +1,9 @@
 module.exports = (sequelize, DataTypes) => {
-
-  const RendezVousType = sequelize.define('RendezVousType', {
+  const CommRequestStatus = sequelize.define('CommRequestStatus', {
     id: {
       type: DataTypes.UUID,
-      primaryKey: true,
       defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
     },
     name: {
       type: DataTypes.STRING,
@@ -12,5 +11,5 @@ module.exports = (sequelize, DataTypes) => {
     },
   });
 
-  return RendezVousType;
+  return CommRequestStatus;
 };

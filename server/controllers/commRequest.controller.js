@@ -8,16 +8,14 @@ const Message = db.message;
 
 exports.create = async (req, res) => {
   const { status, advisor } = req.body;
-  const client = req.user.id;
+  const reqUser = req.user;
 
-  if (!status || !client || !advisor) {
+  if (!status || !advisor) {
     return res.status(400).json({ message: 'Missing required fields' });
   }
-  
-  const user = await Users.findByPk(client);
 
-  if (!user || user.isAdmin) {
-    return res.status(401).json({ message: 'Access denied !' });
+  if (reqUser.isAdmin) {
+    return res.status(403).json({ message: 'Access denied !' });
   }
   
   const advisorUser = await Users.findByPk(advisor);
@@ -32,7 +30,7 @@ exports.create = async (req, res) => {
 
   const commRequest = {
     status: status,
-    client: client,
+    client: reqUser.id,
     advisor: advisor,
   };
 
@@ -48,99 +46,45 @@ exports.create = async (req, res) => {
 };
 
 exports.findAll = async (req, res) => {
+  const reqUser = req.user;
 
-  const reqUser = req.user.id;
+  if (!reqUser.isAdmin) {
+    const commRequests = await CommRequest.findAll({
+      where: { client: reqUser.id },
+    }).catch((err) => {
+      return res.status(500).json({
+        message: err.message || 'Some error occurred while retrieving the CommRequests.',
+      });
+    });
 
-  const user = await Users.findByPk(reqUser);
-
-  if (!user || !user.isAdmin) {
-    return res.status(401).json({ message: 'Access denied !' });
+    return res.status(200).json(commRequests);
   }
 
-  const commRequest = await CommRequest.findAll();
+  const commRequests = await CommRequest.findAll();
 
-  if (!commRequest) {
-    return res.status(404).json({ message: 'No commRequest found' });
-  }
-
-  return res.status(200).json(commRequest);
+  return res.status(200).json(commRequests);
 };
 
 exports.findOne = async (req, res) => {
-
-  const reqUser = req.user.id;
-
-  const user = await Users.findByPk(reqUser);
-
-  if (!user) {
-    return res.status(401).json({ message: 'Access denied !' });
-  }
-
+  const reqUser = req.user;
   const id = req.params.id;
-
-  if (!id) {
-    return res.status(400).json({ message: 'Missing required fields' });
-  }
-
+  
   const commRequest = await CommRequest.findByPk(id);
 
   if (!commRequest) {
     return res.status(404).json({ message: 'CommRequest not found' });
   }
 
-  if (!user.isAdmin && commRequest.client !== reqUser) {
+  if ((!reqUser.isAdmin && commRequest.client !== reqUser.id) || (reqUser.isAdmin && commRequest.advisor !== reqUser.id)) {
     return res.status(401).json({ message: 'Access denied !' });
   }
 
   return res.status(200).json(commRequest);
-};
-
-exports.findAllByToken = async (req, res) => {
-  const reqUser = req.user.id;
-
-  const user = await Users.findByPk(reqUser);
-
-  if (!user) {
-    return res.status(401).json({ message: 'Access denied !' });
-  }
-
-  if (user.isAdmin) {
-    const commRequests = await CommRequest.findAll({
-      where: {
-        advisor: reqUser,
-      },
-    }).catch((err) => {
-      res.status(500).json({
-        message: err.message || 'Some error occurred while retrieving the CommRequests.',
-      });
-    });
-
-    if (!commRequests) {
-      return res.status(404).json({ message: 'No commRequests found' });
-    }
-
-    return res.status(200).json(commRequests);
-  } else {
-    const commRequests = await CommRequest.findAll({
-      where: {
-        client: reqUser,
-      },
-    }).catch((err) => {
-      res.status(500).json({
-        message: err.message || 'Some error occurred while retrieving the CommRequests.',
-      });
-    });
-
-    if (!commRequests) {
-      return res.status(404).json({ message: 'No commRequests found' });
-    }
-
-    return res.status(200).json(commRequests);
-  }
 };
 
 exports.update = async (req, res) => {
   const id = req.params.id;
+  const reqUser = req.user;
 
   if (!id) {
     return res.status(400).json({ message: 'Missing required fields' });
@@ -152,7 +96,11 @@ exports.update = async (req, res) => {
     return res.status(404).json({ message: 'CommRequest not found' });
   }
 
-  await CommRequest.update(req.body, {
+  if (!reqUser.isAdmin || (reqUser.isAdmin && commRequest.advisor !== reqUser.id)) {
+    return res.status(401).json({ message: 'Access denied !' });
+  }
+
+  await CommRequest.update({status: req.body.status}, {
     where: { id: id },
   })
     .then((num) => {
@@ -167,113 +115,3 @@ exports.update = async (req, res) => {
       }
     });
 };
-
-exports.delete = async (req, res) => {
-  const id = req.params.id;
-
-  if (!id) {
-    return res.status(400).json({ message: 'Missing required fields' });
-  }
-
-  const commRequest = await CommRequest.findByPk(id);
-
-  if (!commRequest) {
-    return res.status(404).json({ message: 'CommRequest not found' });
-  }
-
-  await CommRequest.destroy({
-    where: { id: id },
-  })
-    .then((num) => {
-      if (num == 1) {
-        res.status(200).json({
-          message: 'CommRequest was deleted successfully!',
-        });
-      } else {
-        res.status(500).json({
-          message: 'Cannot delete CommRequest. Maybe CommRequest was not found!',
-        });
-      }
-    });
-};
-
-/* Message relation */
-
-exports.postMessage = async (req, res) => {
-  const email = req.user.id;
-
-  const user = await Users.findByPk(email);
-
-  if (!user) {
-    return res.status(401).json({ message: 'Access denied !' });
-  }
-
-  const { commRequestId, content } = req.body;
-
-  if (!commRequestId || !content) {
-    return res.status(400).json({ message: 'Missing required fields' });
-  }
-
-  const commRequest = await CommRequest.findByPk(commRequestId);
-
-  if (!commRequest) {
-    return res.status(404).json({ message: 'CommRequest not found' });
-  }
-
-  if ((!user.isAdmin && commRequest.client !== email) || (user.isAdmin && commRequest.advisor !== email)) {
-    return res.status(401).json({ message: 'Access denied !' });
-  }
-
-  const message = {
-    sender: email,
-    content: content,
-  };
-
-  await Message.create(message)
-    .then((data) => {
-      commRequest.addMessage(data);
-      res.status(201).json(data);
-    })
-    .catch((err) => {
-      res.status(500).json({
-        message: err.message || 'Some error occurred while creating the Message.',
-      });
-    });
-
-};
-
-exports.getMessages = async (req, res) => {
-
-  const email = req.user.id;
-
-  const user = await Users.findByPk(email);
-
-  if (!user) {
-    return res.status(401).json({ message: 'Access denied !' });
-  }
-
-  const commRequestId = req.params.id;
-
-  if (!commRequestId) {
-    return res.status(400).json({ message: 'Missing required fields' });
-  }
-
-  const commRequest = await CommRequest.findByPk(commRequestId);
-
-  if (!commRequest) {
-    return res.status(404).json({ message: 'CommRequest not found' });
-  }
-
-  if ((!user.isAdmin && commRequest.client !== email) || (user.isAdmin && commRequest.advisor !== email)) {
-    return res.status(401).json({ message: 'Access denied !' });
-  }
-
-  const messages = await commRequest.getMessages();
-
-  if (!messages) {
-    return res.status(404).json({ message: 'Messages not found' });
-  }
-
-  return res.status(200).json(messages);
-};
-

@@ -7,6 +7,12 @@ const Message = db.message;
 // TODO : Apart from Message methods and findAll, check if user is an admin in all the methods
 
 exports.create = async (req, res) => {
+  const reqUser = req.user;
+
+  if (!reqUser.isAdmin) {
+    return res.status(401).json({ message: 'Access denied !' });
+  }
+
   const { name, userSize } = req.body;
 
   if (!name || !userSize) {
@@ -30,12 +36,7 @@ exports.create = async (req, res) => {
 };
 
 exports.findAll = async (req, res) => {
-
   const salons = await Salon.findAll();
-  
-  if (!salons) {
-    return res.status(404).json({ message: 'No salons found' });
-  }
 
   return res.status(200).json(salons);
 };
@@ -56,29 +57,13 @@ exports.findOne = async (req, res) => {
   return res.status(200).json(salon);
 };
 
-exports.getUsers = async (req, res) => {
-  const id = req.params.id;
-
-  if (!id) {
-    return res.status(400).json({ message: 'Missing required fields' });
-  }
-
-  const salon = await Salon.findByPk(id);
-  
-  if (!salon) {
-    return res.status(404).json({ message: 'Salon not found' });
-  }
-
-  const users = await salon.getUsers();
-
-  if (!users) {
-    return res.status(404).json({ message: 'No users found' });
-  }
-
-  return res.status(200).json(users);
-};
-
 exports.update = async (req, res) => {
+  const reqUser = req.user;
+
+  if (!reqUser.isAdmin) {
+    return res.status(401).json({ message: 'Access denied !' });
+  }
+
   const id = req.params.id;
 
   if (!id) {
@@ -113,6 +98,12 @@ exports.update = async (req, res) => {
 };
 
 exports.delete = async (req, res) => {
+  const reqUser = req.user;
+
+  if (!reqUser.isAdmin) {
+    return res.status(401).json({ message: 'Access denied !' });
+  }
+
   const id = req.params.id;
 
   if (!id) {
@@ -145,69 +136,3 @@ exports.delete = async (req, res) => {
       });
     });
 };
-
-/* Messages relation */
-
-// TODO : Check if user is an admin or in the salon
-
-exports.postMessage = async (req, res) => {
-  const { salonId, content } = req.body;
-  const email = req.user.id;
-
-  if (!salonId || !email || !message) {
-    return res.status(400).json({ message: 'Missing required fields' });
-  }
-
-  const salon = await Salon.findByPk(salonId);
-
-  if (!salon) {
-    return res.status(404).json({ message: 'Salon not found' });
-  }
-
-  const user = await Users.findByPk(email);
-
-  if (!user) {
-    return res.status(404).json({ message: 'User not found' });
-  }
-
-  var message = {
-    sender: email,
-    content: content,
-  };
-
-  await Message.createMessage(message)
-    .then((data) => {
-      Salon.addMessage(message);
-      res.status(201).json(data);
-    })
-    .catch((err) => {
-      res.status(500).json({
-        message: err.message || 'Some error occurred while creating the Message.',
-      });
-    });
-  
-};
-
-exports.getMessages = async (req, res) => {
-  const salonId = req.params.id;
-  
-  if (!salonId) {
-    return res.status(400).json({ message: 'Missing required fields' });
-  }
-
-  const salon = await Salon.findByPk(salonId);
-
-  if (!salon) {
-    return res.status(404).json({ message: 'Salon not found' });
-  }
-
-  const messages = await salon.getMessages();
-
-  if (!messages) {
-    return res.status(404).json({ message: 'No messages found' });
-  }
-
-  return res.status(200).json(messages);
-};
-
-// QUESTION : Add delete message and update message ?

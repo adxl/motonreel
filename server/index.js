@@ -28,15 +28,9 @@ app.get('/salons', auth, salons.findAll);
 
 app.get('/salons/:id', auth, salons.findOne);
 
-app.get('/salons/:id/users', auth, salons.getUsers);
-
 app.patch('/salons/:id', auth, salons.update);
 
 app.delete('/salons/:id', auth, salons.delete);
-
-// Salon / Message Routes
-
-
 
 /* User Routes */
 
@@ -48,13 +42,9 @@ app.post('/login', users.login);
 
 app.get('/me', auth, users.findOneByToken);
 
-app.get('/users', auth, users.findAll);
-
-app.get('/users/:id', auth, users.findOne);
+app.get('/advisors', auth, users.findAdvisors);
 
 app.patch('/users/:id', auth, users.update);
-
-app.delete('/users/:id', auth, users.delete);
 
 // User / Salon Routes
 
@@ -62,19 +52,25 @@ app.post('/users/addSalon', auth, users.addSalon);
 
 app.post('/users/removeSalon', auth, users.removeSalon);
 
-/* Vehicle Routes */
+/* RendezVous Routes */
 
-const vehicles = require('./controllers/vehicles.controller');
+const rendezVous = require('./controllers/rendezVous.controller');
 
-app.post('/vehicles/create', vehicles.create);
+app.get('/rendezvous', auth, rendezVous.findAll);
 
-app.get('/vehicles', vehicles.findAll);
+app.post('/rendezvous/create', auth, rendezVous.create);
 
-app.get('/vehicles/:id', vehicles.findOne);
+/* CommRequest Routes */
 
-app.patch('/vehicles/:id', vehicles.update);
+const commRequest = require('./controllers/commRequest.controller');
 
-app.delete('/vehicles/:id', vehicles.delete);
+app.get('/commRequests', auth, commRequest.findAll);
+
+app.get('/commRequests/:id', auth, commRequest.findOne);
+
+app.post('/commRequests/create', auth, commRequest.create);
+
+app.patch('/commRequests/:id', auth, commRequest.update);
 
 const { PORT } = process.env;
 app.listen(PORT, () => {

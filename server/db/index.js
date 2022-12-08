@@ -45,6 +45,16 @@ db.salon.belongsToMany(db.users, {
   through: db.salonUser,
 });
 
+db.privateChat = require('./models/PrivateChat.model')(connection, DataTypes);
+db.users.hasMany(db.privateChat, {
+  foreignKey: 'firUser',
+  allowNull: false,
+});
+db.users.hasMany(db.privateChat, {
+  foreignKey: 'secUser',
+  allowNull: false,
+});
+
 db.message = require('./models/Message.model')(connection, DataTypes);
 db.users.hasMany(db.message, {
   foreignKey: 'sender',
@@ -58,6 +68,16 @@ db.salon.belongsToMany(db.message, {
   through: db.salonMessage,
 });
 
+db.privateChatMessage = require('./models/PrivateChatMessage.model')(connection, DataTypes);
+db.message.belongsToMany(db.privateChat, {
+  through: db.privateChatMessage,
+});
+db.privateChat.belongsToMany(db.message, {
+  through: db.privateChatMessage,
+});
+
+db.commRequestType = require('./models/CommRequestStatus.model')(connection, DataTypes);
+
 db.commRequest = require('./models/CommRequest.model')(connection, DataTypes);
 db.users.hasMany(db.commRequest, {
   foreignKey: {
@@ -68,6 +88,12 @@ db.users.hasMany(db.commRequest, {
 db.users.hasMany(db.commRequest, {
   foreignKey: {
     name: 'advisor',
+    allowNull: false,
+  },
+});
+db.commRequestType.hasMany(db.commRequest, {
+  foreignKey: {
+    name: 'status',
     allowNull: false,
   },
 });
@@ -95,8 +121,6 @@ db.users.hasMany(db.rendezVous, {
     allowNull: false,
   },
 });
-
-db.vehicles = require('./models/Vehicles.model')(connection, DataTypes);
 
 /* Database Initialization */
 

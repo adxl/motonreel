@@ -15,8 +15,12 @@ module.exports = async (req, res, next) => {
 
   const user = await verifyToken(token);
   if (user) {
-    req.user = await Users.findByPk(
-      user.email,
+    req.user = await Users.findOne(
+      {
+        where: {
+          email: user.email,
+        },
+      },
       {
         // permet de récupérer des données de jointure
         // include: [],
