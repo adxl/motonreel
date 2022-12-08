@@ -99,13 +99,17 @@ exports.findAdvisors = async (req, res) => {
 
   if (!reqUser.isAdmin) {
     const advisors = await Users.findAll({
+      attributes: { exclude: ["token", "password"] },
       where: { isAdmin: true, disponibility: true },
     });
 
     return res.status(200).json(advisors);
   }
 
-  const advisors = await Users.findAll({ where: { isAdmin: true } });
+  const advisors = await Users.findAll({
+    attributes: { exclude: ["token", "password"] },
+    where: { isAdmin: true },
+  });
 
   return res.status(200).json(advisors);
 };
