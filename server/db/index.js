@@ -76,7 +76,7 @@ db.privateChat.belongsToMany(db.message, {
   through: db.privateChatMessage,
 });
 
-db.commRequestType = require('./models/CommRequestType.model')(connection, DataTypes);
+db.commRequestType = require('./models/CommRequestStatus.model')(connection, DataTypes);
 
 db.commRequest = require('./models/CommRequest.model')(connection, DataTypes);
 db.users.hasMany(db.commRequest, {

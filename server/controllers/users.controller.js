@@ -127,34 +127,6 @@ exports.update = async (req, res) => {
     });
 };
 
-// QUESTION : Hard or soft delete ?
-
-exports.delete = async (req, res) => {
-  const reqUser = req.user;
-
-  await Users.destroy({
-    where: { id: reqUser.id },
-  })
-    .then((num) => {
-      if (num == 1) {
-        res.status(200).json({
-          message: "User was deleted successfully!",
-        });
-      } else {
-        res.status(500).json({
-          message: "Cannot delete User. Maybe User was not found!",
-        });
-      }
-    })
-    .catch(() => {
-      res.status(500).json({
-        message: "Could not delete User",
-      });
-    });
-
-  //Destroy session
-};
-
 /* Salon relation */
 
 exports.addSalon = async (req, res) => {
