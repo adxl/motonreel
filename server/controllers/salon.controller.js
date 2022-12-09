@@ -1,6 +1,5 @@
 const db = require("../db").db;
 const Salon = db.salon;
-const Users = db.users;
 const Message = db.message;
 
 // TODO : Check if user exists in all the methods
@@ -10,7 +9,7 @@ exports.create = async (req, res) => {
   const reqUser = req.user;
 
   if (!reqUser.isAdmin) {
-    return res.status(401).json({ message: "Access denied !" });
+    return res.status(403).json({ message: "Access denied !" });
   }
 
   const { name, userSize } = req.body;
@@ -36,7 +35,7 @@ exports.create = async (req, res) => {
 };
 
 exports.findAll = async (req, res) => {
-  const salons = await Salon.findAll({ include: [Message, Users] });
+  const salons = await Salon.findAll({ include: [Message] });
 
   return res.status(200).json(salons);
 };
@@ -61,7 +60,7 @@ exports.update = async (req, res) => {
   const reqUser = req.user;
 
   if (!reqUser.isAdmin) {
-    return res.status(401).json({ message: "Access denied !" });
+    return res.status(403).json({ message: "Access denied !" });
   }
 
   const id = req.params.id;
@@ -102,7 +101,7 @@ exports.delete = async (req, res) => {
   const reqUser = req.user;
 
   if (!reqUser.isAdmin) {
-    return res.status(401).json({ message: "Access denied !" });
+    return res.status(403).json({ message: "Access denied !" });
   }
 
   const id = req.params.id;

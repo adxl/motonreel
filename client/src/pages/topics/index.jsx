@@ -43,9 +43,7 @@ export default function Forum() {
               <td>
                 <Link to={`/forum/${topic.id}`}>{topic.name}</Link>
               </td>
-              <td>
-                {topic.Users.length}/{topic.userSize}
-              </td>
+              <td>Temps réel/{topic.userSize}</td>
               <td> {topic.Messages.length}</td>
               {isAdmin && (
                 <td>
