@@ -11,10 +11,6 @@ const corsConfig = {
 };
 app.use(cors(corsConfig));
 
-app.get("/", (_, res) => {
-  res.json("Hello Word !");
-});
-
 // Parsing body content to json
 app.use(express.json());
 

@@ -1,0 +1,15 @@
+import { _get, _post } from "./gateway";
+
+export function getRendezVous(token, type = null) {
+  let path = "/rendezvous";
+
+  if (type) {
+    path += "?type=" + type;
+  }
+  return _get(path, token);
+}
+
+export function createRendezVous(date, type, token) {
+  const data = { date, type };
+  return _post("/rendezvous/create", data, token);
+}
