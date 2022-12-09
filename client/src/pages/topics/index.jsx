@@ -49,12 +49,7 @@ export default function Forum() {
               <td> {topic.Messages.length}</td>
               {isAdmin && (
                 <td>
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    className="mr-5" // mr bootstrap doesn't work
-                    style={{ marginRight: "1em" }}
-                  >
+                  <Button variant="primary" size="sm" className="me-1">
                     Modifier
                   </Button>
                   <Button variant="danger" size="sm">
