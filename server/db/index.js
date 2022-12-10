@@ -1,4 +1,4 @@
-const { Sequelize } = require("sequelize");
+const { Sequelize, Op } = require("sequelize");
 
 const isLocal = process.env.STAGE === "local";
 const dialectOptions = !isLocal
@@ -74,7 +74,7 @@ db.privateChat.belongsToMany(db.message, {
   through: db.privateChatMessage,
 });
 
-db.commRequestType = require("./models/CommRequestStatus.model")(
+db.CommRequestStatus = require("./models/CommRequestStatus.model")(
   connection,
   DataTypes
 );
@@ -92,7 +92,7 @@ db.users.hasMany(db.commRequest, {
     allowNull: false,
   },
 });
-db.commRequestType.hasMany(db.commRequest, {
+db.CommRequestStatus.hasMany(db.commRequest, {
   foreignKey: {
     name: "status",
     allowNull: false,
@@ -133,7 +133,38 @@ db.users.hasMany(db.rendezVous, {
 const initDatabase = async () => {
   console.log("Initializing database");
 
-  db.connection.sync({ alter: true, logging: true, force: true });
+  await db.connection.sync({ alter: true, logging: true, force: true });
+
+  await db.CommRequestStatus.destroy({
+    where: {
+      [Op.or]: [
+        { id: "a57014e4-19bd-471c-979a-1c77cc16ad4a" },
+        { id: "23fb3b0e-c5bd-4dc3-b186-60be4987fd7c" },
+        { id: "342fc969-aa8f-486c-88b4-821042a01640" },
+        { id: "770fbb69-658a-4dc9-b5ed-26ae596793a7" },
+      ],
+    },
+  });
+
+  await db.CommRequestStatus.create({
+    id: "a57014e4-19bd-471c-979a-1c77cc16ad4a",
+    name: "En cours",
+  });
+
+  await db.CommRequestStatus.create({
+    id: "23fb3b0e-c5bd-4dc3-b186-60be4987fd7c",
+    name: "Acceptée",
+  });
+
+  await db.CommRequestStatus.create({
+    id: "342fc969-aa8f-486c-88b4-821042a01640",
+    name: "Refusée",
+  });
+
+  await db.CommRequestStatus.create({
+    id: "770fbb69-658a-4dc9-b5ed-26ae596793a7",
+    name: "Terminée",
+  });
 
   console.log("Database synced");
 };
