@@ -7,10 +7,10 @@ const Message = db.message;
 // TODO : Apart from create, check if user is the client or the advisor in all the methods
 
 exports.create = async (req, res) => {
-  const { status, advisor } = req.body;
+  const { advisor } = req.body;
   const reqUser = req.user;
 
-  if (!status || !advisor) {
+  if (!advisor) {
     return res.status(400).json({ message: "Missing required fields" });
   }
 
@@ -24,12 +24,12 @@ exports.create = async (req, res) => {
     return res.status(404).json({ message: "Advisor not found" });
   }
 
-  if (!advisor.disponibility) {
+  if (!advisorUser.disponibility) {
     return res.status(400).json({ message: "Advisor not available" });
   }
 
   const commRequest = {
-    status: status,
+    status: 1,
     client: reqUser.id,
     advisor: advisor,
   };
@@ -109,6 +109,9 @@ exports.update = async (req, res) => {
     return res.status(403).json({ message: "Access denied !" });
   }
 
+  /**
+   * Status can only be 1: "En attente", 2: "Acceptée", 3: "Refusée" or 4: "Résolue"
+   */
   await CommRequest.update(
     { status: req.body.status },
     {

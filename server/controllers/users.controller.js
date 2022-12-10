@@ -48,7 +48,7 @@ exports.login = async (req, res) => {
       .status(400)
       .json({ message: `Champs obligatoires manquants ${email} ${password}` });
   }
-  
+
   const user = await Users.findOne({ where: { email: email } });
 
   if (!user) {
@@ -98,12 +98,18 @@ exports.findAdvisors = async (req, res) => {
   const reqUser = req.user;
 
   if (!reqUser.isAdmin) {
-    const advisors = await Users.findAll({ where: { isAdmin: true, disponibility: true } });
+    const advisors = await Users.findAll({
+      where: { isAdmin: true, disponibility: true },
+      attributes: { exclude: ["password", "token"] },
+    });
 
     return res.status(200).json(advisors);
   }
 
-  const advisors = await Users.findAll({ where: { isAdmin: true } });
+  const advisors = await Users.findAll({
+    where: { isAdmin: true },
+    attributes: { exclude: ["password", "token"] },
+  });
 
   return res.status(200).json(advisors);
 };
@@ -111,20 +117,23 @@ exports.findAdvisors = async (req, res) => {
 exports.update = async (req, res) => {
   const reqUser = req.user;
 
-  await Users.update({disponibility: req.body.disponibility}, {
-    where: { id: reqUser.id },
-  })
-    .then((num) => {
-      if (num == 1) {
-        res.status(200).json({
-          message: 'User was updated successfully.',
-        });
-      } else {
-        res.status(500).json({
-          message: 'Cannot update User. Maybe User was not found or req.body is empty!',
-        });
-      }
-    });
+  await Users.update(
+    { disponibility: req.body.disponibility },
+    {
+      where: { id: reqUser.id },
+    }
+  ).then((num) => {
+    if (num == 1) {
+      res.status(200).json({
+        message: "User was updated successfully.",
+      });
+    } else {
+      res.status(500).json({
+        message:
+          "Cannot update User. Maybe User was not found or req.body is empty!",
+      });
+    }
+  });
 };
 
 /* Salon relation */
@@ -149,9 +158,10 @@ exports.addSalon = async (req, res) => {
     return res.status(400).json({ message: "Salon is full" });
   }
 
-  await reqUser.addSalon(salon, {
-    through: { joined: new Date() },
-  })
+  await reqUser
+    .addSalon(salon, {
+      through: { joined: new Date() },
+    })
     .then((data) => {
       return res.status(201).json(data);
     })
@@ -176,7 +186,8 @@ exports.removeSalon = async (req, res) => {
     return res.status(404).json({ message: "Salon not found" });
   }
 
-  await reqUser.removeSalon(salon)
+  await reqUser
+    .removeSalon(salon)
     .then(() => {
       return res.status(200).json({ message: "Salon removed from user" });
     })
