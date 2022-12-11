@@ -48,6 +48,8 @@ export default function ForumEditor() {
     }
 
     updateSalon(topicId, _salon, token)
+      //TODO add checking of numbers of users actively in chat before update */
+
       .then(({ data: data }) => {
         setSuccessMessage(data.message);
         setSalon(_salon);
