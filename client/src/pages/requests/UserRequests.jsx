@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "@hooks/auth";
 
 import { getAdvisors } from "../../api/advisors";
-import { createRequest } from "../../api/commRequests";
+import { createRequest, getRequests } from "../../api/commRequests";
 
 const tdStyle = {
   verticalAlign: "middle",
@@ -17,6 +17,7 @@ const tdStyle = {
 export default function UserRequests() {
   const { token } = useAuth();
   const [_advisors, setAdvisors] = React.useState([]);
+  const [_requests, setRequests] = React.useState([]);
 
   const [_alertMessage, setAlertMessage] = React.useState("");
   const [_alertVariant, setAlertVariant] = React.useState("success");
@@ -26,11 +27,17 @@ export default function UserRequests() {
     getAdvisors(token).then((advisors) => {
       setAdvisors(advisors.data);
     });
+    getRequests(token).then((requests) => {
+      setRequests(requests.data);
+    });
   }, []);
 
   const handleRequest = (advisor) => {
     createRequest(advisor, token).then((response) => {
       if (response.status === 201) {
+        setAdvisors((advisors) => {
+          advisors.filter((removeAdvisor) => removeAdvisor.id !== advisor.id);
+        });
         onShowAlert("Votre demande a été envoyée", "success");
       } else {
         onShowAlert("Une erreur est survenue", "danger");
@@ -65,21 +72,36 @@ export default function UserRequests() {
             </tr>
           </thead>
           <tbody>
-            {_advisors.map((advisor) => (
-              <tr key={advisor.id}>
-                <td style={tdStyle}>{advisor.name}</td>
-                <td style={tdStyle}>Disponible</td>
-                <td style={tdStyle}>
-                  <Button
-                    onClick={() => {
-                      handleRequest(advisor.id);
-                    }}
-                  >
-                    Envoyer une demande
-                  </Button>
-                </td>
-              </tr>
-            ))}
+            {_advisors !== undefined &&
+              _advisors.map((advisor) => {
+                if (
+                  _requests.find(
+                    (request) =>
+                      request.advisor !== advisor.id ||
+                      (request.status !==
+                        "a57014e4-19bd-471c-979a-1c77cc16ad4a" &&
+                        request.status !==
+                          "23fb3b0e-c5bd-4dc3-b186-60be4987fd7c")
+                  ) ||
+                  _requests.length === 0
+                ) {
+                  return (
+                    <tr key={advisor.id}>
+                      <td style={tdStyle}>{advisor.name}</td>
+                      <td style={tdStyle}>Disponible</td>
+                      <td style={tdStyle}>
+                        <Button
+                          onClick={() => {
+                            handleRequest(advisor.id);
+                          }}
+                        >
+                          Envoyer une demande
+                        </Button>
+                      </td>
+                    </tr>
+                  );
+                }
+              })}
           </tbody>
         </Table>
         <div className="d-flex align-items-center">

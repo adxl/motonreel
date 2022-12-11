@@ -1,7 +1,6 @@
 const db = require("../db").db;
 const CommRequest = db.commRequest;
 const Users = db.users;
-const Message = db.message;
 
 // TODO : Check if user exists in all the methods
 // TODO : Apart from create, check if user is the client or the advisor in all the methods
@@ -29,7 +28,7 @@ exports.create = async (req, res) => {
   }
 
   const commRequest = {
-    status: 1,
+    status: "a57014e4-19bd-471c-979a-1c77cc16ad4a",
     client: reqUser.id,
     advisor: advisor,
   };
