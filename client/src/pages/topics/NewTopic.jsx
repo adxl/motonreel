@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import Alert from "react-bootstrap/Alert";
+import React, { useState } from "react";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
@@ -7,6 +6,7 @@ import Row from "react-bootstrap/Row";
 import { Link } from "react-router-dom";
 
 import { createSalon } from "@api/salon";
+import { useAlert } from "@hooks/alert";
 import { useAuth } from "@hooks/auth";
 
 export default function ForumCreator() {
@@ -15,13 +15,7 @@ export default function ForumCreator() {
   const [_nameInput, setNameInput] = useState("");
   const [_userSizeInput, setUserSize] = useState("");
 
-  const [_errorMessage, setErrorMessage] = useState();
-  const [_successMessage, setSuccessMessage] = useState();
-
-  useEffect(() => {
-    setErrorMessage(null);
-    setSuccessMessage(null);
-  }, [_nameInput, _userSizeInput]);
+  const { alertSuccess, alertError } = useAlert();
 
   function handleNameChange(event) {
     setNameInput(event.target.value);
@@ -32,10 +26,11 @@ export default function ForumCreator() {
 
   function handleCreateForum(event) {
     event.preventDefault();
-    if (!_nameInput || !_userSizeInput) return;
+    if (!_nameInput || !_userSizeInput)
+      return alertError("Des champs sont manquants");
 
     if (isNaN(_userSizeInput) || parseInt(_userSizeInput) <= 0) {
-      setErrorMessage(
+      alertError(
         "La capacité du salon doit être un nombre et supérieur à zéro"
       );
       return;
@@ -43,18 +38,16 @@ export default function ForumCreator() {
 
     createSalon(_nameInput, _userSizeInput, token)
       .then(({ data: data }) => {
-        setSuccessMessage(data.message);
+        alertSuccess(data.message);
       })
       .catch((error) => {
-        setErrorMessage(error.response.data.message);
+        alertError(error.response.data.message);
       });
   }
 
   return (
     <Container>
       <h1>Créer une discussion</h1>
-      {_errorMessage && <Alert variant="danger">{_errorMessage}</Alert>}
-      {_successMessage && <Alert variant="success">{_successMessage}</Alert>}
       <Form onSubmit={handleCreateForum}>
         <Row className="mb-5">
           <Form.Group className="mb-3">
@@ -76,7 +69,7 @@ export default function ForumCreator() {
             />
           </Form.Group>
         </Row>
-        <Button type="submit" variant="primary">
+        <Button type="submit" variant="primary" className="mb-5">
           Créer le salon
         </Button>
       </Form>

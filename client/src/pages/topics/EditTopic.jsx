@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
@@ -7,21 +6,16 @@ import Row from "react-bootstrap/Row";
 import { Link, useParams } from "react-router-dom";
 
 import { getSalon, updateSalon } from "@api/salon";
+import { useAlert } from "@hooks/alert";
 import { useAuth } from "@hooks/auth";
 
 export default function ForumEditor() {
-  const [_errorMessage, setErrorMessage] = useState("");
-  const [_successMessage, setSuccessMessage] = useState("");
   const [_isLoaded, setIsLoaded] = useState(false);
 
   const { token } = useAuth();
+  const { alertError, alertSuccess } = useAlert();
   const { topicId } = useParams();
   const [_salon, setSalon] = useState({});
-
-  useEffect(() => {
-    setErrorMessage(null);
-    setSuccessMessage(null);
-  }, [_salon]);
 
   useEffect(() => {
     getSalon(topicId, token).then((salon) => {
@@ -38,10 +32,11 @@ export default function ForumEditor() {
 
   function handleTopicEdit(event) {
     event.preventDefault();
-    if (!(_salon.name && _salon.userSize)) return;
+    if (!(_salon.name && _salon.userSize))
+      return alertError("Des champs sont manquants");
 
     if (isNaN(_salon.userSize) || parseInt(_salon.userSize) <= 0) {
-      setErrorMessage(
+      alertError(
         "La capacité du salon doit être un nombre et supérieur à zéro"
       );
       return;
@@ -51,12 +46,12 @@ export default function ForumEditor() {
       //TODO add checking of numbers of users actively in chat before update */
 
       .then(({ data: data }) => {
-        setSuccessMessage(data.message);
+        alertSuccess(data.message);
         setSalon(_salon);
         console.log(data);
       })
       .catch(({ err: err }) => {
-        setErrorMessage(err.message);
+        alertError(err.message);
       });
   }
 
@@ -64,8 +59,6 @@ export default function ForumEditor() {
   else
     return (
       <Container>
-        {_errorMessage && <Alert variant="danger">{_errorMessage}</Alert>}
-        {_successMessage && <Alert variant="success">{_successMessage}</Alert>}
         <h1>Modifier la discussion</h1>
         <Form onSubmit={handleTopicEdit}>
           <Row>
@@ -88,7 +81,7 @@ export default function ForumEditor() {
               />
             </Form.Group>
           </Row>
-          <Button variant="primary" type="submit">
+          <Button variant="primary" type="submit" className="mb-5">
             Modifier
           </Button>
         </Form>

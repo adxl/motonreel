@@ -31,75 +31,78 @@ const ChatBot = React.lazy(() => import("@pages/chatbot"));
 
 const Error = React.lazy(() => import("@pages/Error"));
 
+import { AlertProvider } from "@hooks/alert";
 import { AuthProvider } from "@hooks/auth";
 
 export default function App() {
   return (
     <div id="app">
-      <AuthProvider>
-        <Suspense fallback={"Chargement..."}>
-          <Router>
-            <Routes>
-              <Route path="/" element={<Navigate to="/requests" />} />
-              <Route exact path="/login" element={<Login />} />
-              <Route exact path="/register" element={<Register />} />
-              <Route
-                exact
-                path="/requests"
-                element={<ProtectedRoute el={Requests} />}
-              />
-              <Route
-                exact
-                path="/requests/:requestId"
-                element={<ProtectedRoute el={RequestChat} />}
-              />
+      <AlertProvider>
+        <AuthProvider>
+          <Suspense fallback={"Chargement..."}>
+            <Router>
+              <Routes>
+                <Route path="/" element={<Navigate to="/requests" />} />
+                <Route exact path="/login" element={<Login />} />
+                <Route exact path="/register" element={<Register />} />
+                <Route
+                  exact
+                  path="/requests"
+                  element={<ProtectedRoute el={Requests} />}
+                />
+                <Route
+                  exact
+                  path="/requests/:requestId"
+                  element={<ProtectedRoute el={RequestChat} />}
+                />
 
-              <Route
-                exact
-                path="/forum"
-                element={<ProtectedRoute el={Topics} />}
-              />
-              <Route
-                exact
-                path="/forum/:topicId"
-                element={<ProtectedRoute el={TopicDetails} />}
-              />
-              <Route
-                exact
-                path="/forum/new"
-                element={<ProtectedRoute el={NewTopic} />}
-                requireAdmin
-              />
-              <Route
-                exact
-                path="/forum/:topicId/edit"
-                element={<ProtectedRoute el={EditTopic} />}
-                requireAdmin
-              />
+                <Route
+                  exact
+                  path="/forum"
+                  element={<ProtectedRoute el={Topics} />}
+                />
+                <Route
+                  exact
+                  path="/forum/:topicId"
+                  element={<ProtectedRoute el={TopicDetails} />}
+                />
+                <Route
+                  exact
+                  path="/forum/new"
+                  element={<ProtectedRoute el={NewTopic} />}
+                  requireAdmin
+                />
+                <Route
+                  exact
+                  path="/forum/:topicId/edit"
+                  element={<ProtectedRoute el={EditTopic} />}
+                  requireAdmin
+                />
 
-              <Route
-                exact
-                path="/chat"
-                element={<ProtectedRoute el={ConversationsList} />}
-              />
-              <Route
-                exact
-                path="/chat/:conversationId"
-                element={<ProtectedRoute el={ConversationDetails} />}
-              />
+                <Route
+                  exact
+                  path="/chat"
+                  element={<ProtectedRoute el={ConversationsList} />}
+                />
+                <Route
+                  exact
+                  path="/chat/:conversationId"
+                  element={<ProtectedRoute el={ConversationDetails} />}
+                />
 
-              <Route
-                exact
-                path="/chatbot"
-                element={<ProtectedRoute el={ChatBot} />}
-              />
+                <Route
+                  exact
+                  path="/chatbot"
+                  element={<ProtectedRoute el={ChatBot} />}
+                />
 
-              <Route path="*" element={<Error />} />
-              <Route exact path="/logout" element={<Logout />} />
-            </Routes>
-          </Router>
-        </Suspense>
-      </AuthProvider>
+                <Route path="*" element={<Error />} />
+                <Route exact path="/logout" element={<Logout />} />
+              </Routes>
+            </Router>
+          </Suspense>
+        </AuthProvider>
+      </AlertProvider>
     </div>
   );
 }
