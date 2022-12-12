@@ -31,5 +31,5 @@ export function _patch(path, body, token) {
 
 export function _delete(path, token) {
   const headers = get_headers(token);
-  return axios.get(URL + path, { headers });
+  return axios.delete(URL + path, { headers });
 }

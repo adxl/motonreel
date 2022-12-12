@@ -15,7 +15,7 @@ exports.create = async (req, res) => {
   const { name, userSize } = req.body;
 
   if (!name || !userSize) {
-    return res.status(400).json({ message: "Missing required fields" });
+    return res.status(400).json({ message: "Champs obligatoires manquants" });
   }
 
   const salon = {
@@ -25,11 +25,13 @@ exports.create = async (req, res) => {
 
   await Salon.create(salon)
     .then((data) => {
-      res.status(201).json(data);
+      res.status(201).json({ salon: data, message: `Salon ${name} crée !` });
     })
     .catch((err) => {
       res.status(500).json({
-        message: err.message || "Some error occurred while creating the Salon.",
+        message:
+          err.message ||
+          "Une erreur s'est produite lors de la création du salon.",
       });
     });
 };
@@ -57,7 +59,11 @@ exports.findOne = async (req, res) => {
 };
 
 exports.update = async (req, res) => {
+  console.log(req);
   const reqUser = req.user;
+  console.log(
+    "ENTER SALON UPDATE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  );
 
   if (!reqUser.isAdmin) {
     return res.status(403).json({ message: "Access denied !" });
@@ -66,13 +72,13 @@ exports.update = async (req, res) => {
   const id = req.params.id;
 
   if (!id) {
-    return res.status(400).json({ message: "Missing required fields" });
+    return res.status(400).json({ message: "Champs obligatoires manquants" });
   }
 
   const salon = await Salon.findByPk(id);
 
   if (!salon) {
-    return res.status(404).json({ message: "Salon not found" });
+    return res.status(404).json({ message: "Salon introuvable" });
   }
 
   await Salon.update(req.body, {
@@ -81,18 +87,17 @@ exports.update = async (req, res) => {
     .then((num) => {
       if (num == 1) {
         res.status(200).json({
-          message: "Salon was updated successfully.",
+          message: `Le salon a bien été mis à jour avec succès.`,
         });
       } else {
         res.status(500).json({
-          message:
-            "Cannot update Salon. Maybe Salon was not found or req.body is empty!",
+          message: `Impossible de mettre à jour le salon ${salon.name}. Peut-être que ce salon n'a pas été trouvé ou que req.body est vide !`,
         });
       }
     })
     .catch(() => {
       res.status(500).json({
-        message: "Error updating Salon",
+        message: "Erreur de mise à jour du salon",
       });
     });
 };
@@ -107,7 +112,7 @@ exports.delete = async (req, res) => {
   const id = req.params.id;
 
   if (!id) {
-    return res.status(400).json({ message: "Missing required fields" });
+    return res.status(400).json({ message: "Champs obligatoires manquants" });
   }
 
   const salon = await Salon.findByPk(id);
@@ -115,7 +120,7 @@ exports.delete = async (req, res) => {
   if (!salon) {
     return res
       .status(404)
-      .json({ message: "Salon not found or already deleted" });
+      .json({ message: `Le salon ${salon.name} introuvable ou déjà supprimé` });
   }
 
   await Salon.destroy({
@@ -124,17 +129,17 @@ exports.delete = async (req, res) => {
     .then((num) => {
       if (num == 1) {
         res.status(200).json({
-          message: "Salon was deleted successfully!",
+          message: `Le salon ${salon.name} a bien été supprimé`,
         });
       } else {
         res.status(500).json({
-          message: "Cannot delete Salon. Maybe Salon was not found!",
+          message: `Impossible de supprimer le salon ${salon.name}. Peut-être qu'il n'a pas été trouvé`,
         });
       }
     })
     .catch(() => {
       res.status(500).json({
-        message: "Could not delete Salon",
+        message: `Impossible de supprimer le salon ${salon.name}.`,
       });
     });
 };
