@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 
 import { update } from "@api/advisors";
 import { getAdvisors } from "@api/advisors";
-import { getRequests } from "@api/commRequests";
+import { getRequests, updateRequest } from "@api/commRequests";
 import { useAuth } from "@hooks/auth";
 
 const tdStyle = {
@@ -30,6 +30,18 @@ export default function AdminRequests() {
     });
     loadRequests();
   }, []);
+
+  function handleChangeStatus(id, status) {
+    if (status === "Accepter") {
+      updateRequest(id, "23fb3b0e-c5bd-4dc3-b186-60be4987fd7c", token).then(
+        () => loadRequests()
+      );
+    } else {
+      updateRequest(id, "342fc969-aa8f-486c-88b4-821042a01640", token).then(
+        () => loadRequests()
+      );
+    }
+  }
 
   function handleChangeDisponibility() {
     update(user.id, !user.disponibility, token).then(() => refreshUser());
@@ -83,11 +95,30 @@ export default function AdminRequests() {
               <td style={tdStyle}>{request.requestStatus.name}</td>
               {request.status === "a57014e4-19bd-471c-979a-1c77cc16ad4a" && (
                 <td style={tdStyle}>
-                  <Button variant="success" type="button">
+                  <Button
+                    variant="success"
+                    type="button"
+                    onClick={() => {
+                      handleChangeStatus(request.id, "Accepter");
+                    }}
+                  >
                     Accepter
                   </Button>
-                  <Button variant="danger" type="button">
+                  <Button
+                    variant="danger"
+                    type="button"
+                    onClick={() => {
+                      handleChangeStatus(request.id, "Refuser");
+                    }}
+                  >
                     Refuser
+                  </Button>
+                </td>
+              )}
+              {request.status === "23fb3b0e-c5bd-4dc3-b186-60be4987fd7c" && (
+                <td style={tdStyle}>
+                  <Button variant="info" type="button">
+                    Accéder au tchat
                   </Button>
                 </td>
               )}
