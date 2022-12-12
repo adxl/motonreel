@@ -4,7 +4,9 @@ const bcrypt = require("bcryptjs");
 const db = require("../db").db;
 const Users = db.users;
 const Salon = db.salon;
+const CommRequest = db.commRequest;
 const SalonController = require("./salon.controller");
+const { Op } = require("sequelize");
 
 // TODO : Apart from create, connected user access
 
@@ -100,10 +102,30 @@ exports.findAdvisors = async (req, res) => {
   if (!reqUser.isAdmin) {
     const advisors = await Users.findAll({
       where: { isAdmin: true, disponibility: true },
-      attributes: { exclude: ["password", "token"] },
     });
 
-    return res.status(200).json(advisors);
+    const commRequests = await CommRequest.findAll({
+      where: {
+        client: reqUser.id,
+      },
+    });
+
+    const filteredAdvisors = advisors.filter((advisor) => {
+      const result = commRequests.find(
+        (commRequest) =>
+          commRequest.advisor === advisor.id &&
+          (commRequest.status === "23fb3b0e-c5bd-4dc3-b186-60be4987fd7c" ||
+            commRequest.status === "a57014e4-19bd-471c-979a-1c77cc16ad4a")
+      );
+
+      if (result) {
+        return false;
+      }
+
+      return true;
+    });
+
+    return res.status(200).json(filteredAdvisors);
   }
 
   const advisors = await Users.findAll({
