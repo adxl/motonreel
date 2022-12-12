@@ -1,5 +1,4 @@
 import React from "react";
-import Alert from "react-bootstrap/Alert";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/esm/Button";
 import Table from "react-bootstrap/Table";
@@ -7,14 +6,16 @@ import { Link } from "react-router-dom";
 
 import { getAdvisors } from "@api/advisors";
 import { createRequest } from "@api/commRequests";
+import { useAlert } from "@api/hooks/alert";
 import { useAuth } from "@hooks/auth";
-
 const tdStyle = {
   verticalAlign: "middle",
 };
 
 export default function UserRequests() {
   const { token } = useAuth();
+  const { alertError } = useAlert();
+
   const [_advisors, setAdvisors] = React.useState([]);
 
   const loadAdvisors = () =>
@@ -23,12 +24,8 @@ export default function UserRequests() {
         setAdvisors(advisors);
       })
       .catch(() => {
-        onShowAlert("", "danger");
+        alertError("Erreur");
       });
-
-  const [_alertMessage, setAlertMessage] = React.useState("");
-  const [_alertVariant, setAlertVariant] = React.useState("success");
-  const [_showAlert, setShowAlert] = React.useState(false);
 
   React.useEffect(() => {
     loadAdvisors();
@@ -40,26 +37,12 @@ export default function UserRequests() {
         loadAdvisors();
       })
       .catch(() => {
-        onShowAlert("Une erreur est survenue", "danger");
+        return alertError("Une erreur est survenue");
       });
-  };
-
-  const onShowAlert = (message, variant) => {
-    setAlertMessage(message);
-    setAlertVariant(variant);
-
-    setShowAlert(true, () => {
-      setTimeout(() => {
-        setShowAlert(false);
-      }, 3000);
-    });
   };
 
   return (
     <>
-      <Alert variant={_alertVariant} show={_showAlert}>
-        {_alertMessage}
-      </Alert>
       <Container>
         <h2>Contacter un conseiller</h2>
         <Table striped bordered hover>

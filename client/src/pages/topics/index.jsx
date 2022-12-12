@@ -6,18 +6,19 @@ import { Link } from "react-router-dom";
 
 import { deleteSalon, getSalons } from "@api/salon";
 import ModalConfirmation from "@components/modal";
+import { useAlert } from "@hooks/alert";
 import { useAuth } from "@hooks/auth";
 
 export default function Forum() {
   const { token } = useAuth();
   const [_salons, setSalons] = useState([]);
-  const [_errorMessage, setErrorMessage] = useState();
-  const [_successMessage, setSuccessMessage] = useState();
   const [_isLoaded, setIsLoaded] = useState(false);
 
   const {
     user: { isAdmin },
   } = useAuth();
+
+  const { alertError, alertSuccess } = useAlert();
 
   useEffect(() => {
     getSalons(token).then((salons) => {
@@ -30,9 +31,9 @@ export default function Forum() {
     deleteSalon(id, token)
       .then(({ data: data }) => {
         hideModal(false);
-        setSuccessMessage(data.message);
+        alertSuccess(data.message);
       })
-      .catch(({ data: data }) => setErrorMessage(data.message));
+      .catch(({ data: data }) => alertError(data.message));
   }
 
   if (!_isLoaded) return "Chargement..";
@@ -40,10 +41,6 @@ export default function Forum() {
     return (
       <>
         <h1>Bienvenue dans le forum</h1>
-
-        {_errorMessage && <Alert variant="danger">{_errorMessage}</Alert>}
-        {_successMessage && <Alert variant="success">{_successMessage}</Alert>}
-
         {isAdmin && <Link to="/forum/new">Ouvrir une nouvelle discussion</Link>}
         {isAdmin && <hr />}
         <p>Nombre de salons : {_salons.length}</p>
