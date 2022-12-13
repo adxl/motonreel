@@ -92,11 +92,32 @@ db.users.hasMany(db.commRequest, {
     allowNull: false,
   },
 });
+db.commRequest.belongsTo(db.users, {
+  foreignKey: {
+    name: "client",
+    allowNull: false,
+  },
+  as: "clientUser",
+});
+db.commRequest.belongsTo(db.users, {
+  foreignKey: {
+    name: "advisor",
+    allowNull: false,
+  },
+  as: "advisorUser",
+});
 db.CommRequestStatus.hasMany(db.commRequest, {
   foreignKey: {
     name: "status",
     allowNull: false,
   },
+});
+db.commRequest.belongsTo(db.CommRequestStatus, {
+  foreignKey: {
+    name: "status",
+    allowNull: false,
+  },
+  as: "requestStatus",
 });
 
 db.commRequestMessage = require("./models/CommRequestMessage.model")(
@@ -133,7 +154,7 @@ db.users.hasMany(db.rendezVous, {
 const initDatabase = async () => {
   console.log("Initializing database");
 
-  await db.connection.sync({ alter: true, logging: true, force: true });
+  await db.connection.sync({ alter: true, logging: true });
 
   await db.CommRequestStatus.destroy({
     where: {

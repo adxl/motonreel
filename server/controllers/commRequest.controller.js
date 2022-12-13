@@ -51,6 +51,18 @@ exports.findAll = async (req, res) => {
   if (!reqUser.isAdmin) {
     const commRequests = await CommRequest.findAll({
       where: { client: reqUser.id },
+      include: [
+        {
+          model: db.users,
+          as: "advisorUser",
+          attributes: ["name"],
+        },
+        {
+          model: db.CommRequestStatus,
+          as: "requestStatus",
+          attributes: ["name"],
+        },
+      ],
     }).catch((err) => {
       return res.status(500).json({
         message:
@@ -62,7 +74,21 @@ exports.findAll = async (req, res) => {
     return res.status(200).json(commRequests);
   }
 
-  const commRequests = await CommRequest.findAll();
+  const commRequests = await CommRequest.findAll({
+    where: { advisor: reqUser.id },
+    include: [
+      {
+        model: db.users,
+        as: "clientUser",
+        attributes: ["name"],
+      },
+      {
+        model: db.CommRequestStatus,
+        as: "requestStatus",
+        attributes: ["name"],
+      },
+    ],
+  });
 
   return res.status(200).json(commRequests);
 };
