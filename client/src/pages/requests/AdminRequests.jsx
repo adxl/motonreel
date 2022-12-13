@@ -117,9 +117,7 @@ export default function AdminRequests() {
               )}
               {request.status === "23fb3b0e-c5bd-4dc3-b186-60be4987fd7c" && (
                 <td style={tdStyle}>
-                  <Button variant="info" type="button">
-                    Accéder au tchat
-                  </Button>
+                  <Link to={`/requests/${request.id}`}>Accéder au tchat</Link>
                 </td>
               )}
             </tr>

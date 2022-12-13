@@ -103,7 +103,7 @@ export default function UserRequests() {
               <td style={tdStyle}>{request.requestStatus.name}</td>
               <td style={tdStyle}>
                 {request.status === "23fb3b0e-c5bd-4dc3-b186-60be4987fd7c" && (
-                  <Button>Accéder tchat</Button>
+                  <Link to={`/requests/${request.id}`}>Accéder tchat</Link>
                 )}
               </td>
             </tr>

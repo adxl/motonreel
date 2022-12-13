@@ -11,3 +11,7 @@ export function getRequests(token) {
 export function updateRequest(id, status, token) {
   return _patch("/commRequests/" + id, { status }, token);
 }
+
+export function getRequest(id, token) {
+  return _get("/commRequests/" + id, token);
+}

@@ -97,16 +97,41 @@ exports.findOne = async (req, res) => {
   const reqUser = req.user;
   const id = req.params.id;
 
-  const commRequest = await CommRequest.findByPk(id);
+  if (!reqUser.isAdmin) {
+    const commRequest = await CommRequest.findByPk(id, {
+      include: [
+        {
+          model: db.users,
+          as: "advisorUser",
+          attributes: ["name"],
+        },
+      ],
+    });
+
+    if (!commRequest) {
+      return res.status(404).json({ message: "CommRequest not found" });
+    }
+
+    if (commRequest.client !== reqUser.id) {
+      return res.status(403).json({ message: "Access denied !" });
+    }
+  }
+
+  const commRequest = await CommRequest.findByPk(id, {
+    include: [
+      {
+        model: db.users,
+        as: "clientUser",
+        attributes: ["name"],
+      },
+    ],
+  });
 
   if (!commRequest) {
     return res.status(404).json({ message: "CommRequest not found" });
   }
 
-  if (
-    (!reqUser.isAdmin && commRequest.client !== reqUser.id) ||
-    (reqUser.isAdmin && commRequest.advisor !== reqUser.id)
-  ) {
+  if (commRequest.advisor !== reqUser.id) {
     return res.status(403).json({ message: "Access denied !" });
   }
 
