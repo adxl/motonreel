@@ -1,6 +1,7 @@
 const db = require("../db").db;
 const Salon = db.salon;
 const Message = db.message;
+const Users = db.users;
 
 // TODO : Check if user exists in all the methods
 // TODO : Apart from Message methods and findAll, check if user is an admin in all the methods
@@ -36,20 +37,30 @@ exports.create = async (req, res) => {
     });
 };
 
-exports.findAll = async (req, res) => {
+exports.findAll = async (_, res) => {
   const salons = await Salon.findAll({ include: [Message] });
-
   return res.status(200).json(salons);
 };
 
 exports.findOne = async (req, res) => {
-  const id = req.params.id;
+  const { id } = req.params;
 
-  if (!id) {
-    return res.status(400).json({ message: "Missing required fields" });
-  }
-
-  const salon = await Salon.findByPk(id);
+  const salon = await Salon.findOne({
+    where: { id },
+    include: [
+      {
+        model: Message,
+        as: "Messages",
+        include: [
+          {
+            model: Users,
+            as: "senderUser",
+            attributes: ["id", "name"],
+          },
+        ],
+      },
+    ],
+  });
 
   if (!salon) {
     return res.status(404).json({ message: "Salon not found" });

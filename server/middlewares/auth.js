@@ -2,36 +2,47 @@ const { verifyToken } = require("../lib/jwt");
 const db = require("../db").db;
 const Users = db.users;
 
-module.exports = async (req, res, next) => {
-  const header = req.headers.authorization;
-  if (!header) {
-    return res.sendStatus(401);
+function throwTokenError(message = "Token is invalid") {
+  throw message;
+}
+
+async function getUser(authorization) {
+  if (!authorization) {
+    throwTokenError();
   }
 
-  const [type, token] = header.split(/\s+/);
+  const [type, token] = authorization.split(/\s+/);
   if (type !== "Bearer") {
+    throwTokenError();
+  }
+
+  const payload = await verifyToken(token);
+  if (!payload) {
+    throwTokenError();
+  }
+
+  const user = await Users.findOne({
+    where: {
+      email: payload.email,
+    },
+  });
+
+  if (!user) {
+    throwTokenError();
+  }
+
+  return user;
+}
+
+async function auth(req, res, next) {
+  try {
+    req.user = await getUser(req.headers.authorization);
+    return next();
+  } catch (error) {
+    console.error(error);
     return res.sendStatus(401);
   }
+}
 
-  const user = await verifyToken(token);
-  if (user) {
-    req.user = await Users.findOne(
-      {
-        where: {
-          email: user.email,
-        },
-      },
-      {
-        // permet de récupérer des données de jointure
-        // include: [],
-      }
-    );
-
-    if (!req.user) return res.sendStatus(404);
-
-    req.user.isUser = !user.isAdmin;
-    return next();
-  }
-
-  return res.sendStatus(401);
-};
+const moduleExport = (module.exports = auth);
+moduleExport.getUser = getUser;
