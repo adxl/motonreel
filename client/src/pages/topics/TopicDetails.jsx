@@ -38,7 +38,8 @@ export default function ForumDetails() {
       <ChatContainer
         domain={NAMESPACE_SALONS}
         recipient={_salon.name}
-        room={topicId}
+        roomId={_salon.id}
+        roomSize={_salon.userSize}
         onReload={loadSalon}
         messages={_messages}
       />

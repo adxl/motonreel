@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import io from "socket.io-client";
 
+import { useAlert } from "@hooks/alert";
 import { useAuth } from "@hooks/auth";
 
 export const NAMESPACE_REQUESTS = "commRequests";
@@ -12,8 +13,15 @@ export function useSocket() {
   return useContext(SocketContext);
 }
 
-export function SocketProvider({ namespace, roomId, onReload, children }) {
+export function SocketProvider({
+  namespace,
+  roomId,
+  roomSize = 2,
+  onReload,
+  children,
+}) {
   const { token } = useAuth();
+  const { alertError } = useAlert();
 
   const [_socket, setSocket] = useState();
 
@@ -26,16 +34,26 @@ export function SocketProvider({ namespace, roomId, onReload, children }) {
       reconnection: false,
       transports: ["websocket", "polling", "flashsocket"],
     });
-    socket.emit("join", roomId);
+
+    socket.on("overflow", () => {
+      alertError(
+        "Vous ne pouvez pas rejoindre cette communication pour le moment"
+      );
+      setTimeout(() => {
+        location.href = "/forum";
+      }, 1000);
+    });
+
+    socket.emit("join", { roomId, roomSize });
 
     setSocket(socket);
-
     return () => socket.close();
   }, []);
 
   useEffect(() => {
     if (_socket) {
       _socket.on("message", () => {
+        console.log("slt");
         onReload();
       });
     }

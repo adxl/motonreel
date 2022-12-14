@@ -47,9 +47,9 @@ export default function Forum() {
         <Table striped bordered hover>
           <thead>
             <tr>
-              <th>Forum</th>
-              <th>Limites de personnes</th>
-              <th>Message au total</th>
+              <th>Sujet de discussion</th>
+              <th>Capacité</th>
+              <th>Messages</th>
               {isAdmin && <th>Actions</th>}
             </tr>
           </thead>
@@ -59,7 +59,7 @@ export default function Forum() {
                 <td>
                   <Link to={`/forum/${topic.id}`}>{topic.name}</Link>
                 </td>
-                <td>Temps réel/{topic.userSize}</td>
+                <td>{topic.userSize}</td>
                 <td> {topic.Messages.length}</td>
                 {isAdmin && (
                   <td>

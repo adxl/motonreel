@@ -26,9 +26,20 @@ module.exports = (server) => {
       const { user } = socket;
       const { name: userName, id: userId } = user;
 
-      socket.on("join", (room) => {
-        socket.join(room);
-        console.log(`--> ${userName} JOINED room ${room}`);
+      socket.on("join", ({ roomId, roomSize }) => {
+        const roomCurrentSize = io
+          .of(DOMAINS.SALONS)
+          .adapter.rooms.get(roomId)?.size;
+
+        if (
+          typeof roomCurrentSize === "undefined" ||
+          roomCurrentSize < roomSize - 1
+        ) {
+          socket.join(roomId);
+          console.log(`--> ${userName} JOINED room ${roomId}`);
+        } else {
+          socket.emit("overflow");
+        }
       });
 
       socket.on("message", (message) => {

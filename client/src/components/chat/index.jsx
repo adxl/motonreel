@@ -10,12 +10,18 @@ import { SocketProvider, useSocket } from "@hooks/chat";
 export default function ChatContainer({
   domain,
   recipient,
-  room,
+  roomId,
+  roomSize,
   messages,
   onReload,
 }) {
   return (
-    <SocketProvider namespace={domain} roomId={room} onReload={onReload}>
+    <SocketProvider
+      namespace={domain}
+      roomId={roomId}
+      roomSize={roomSize}
+      onReload={onReload}
+    >
       <div className="mb-5">
         <h2>
           <strong>{recipient}</strong>
@@ -63,7 +69,7 @@ function ChatConversation({ messages }) {
 
   return (
     <div>
-      <div className="mb-5">
+      <div className="mb-5 chat-area">
         {messages.map(({ id, content, senderUser }) => (
           <div key={id} className="mb-2">
             {senderUser.id === user.id ? (
@@ -84,6 +90,7 @@ function ChatConversation({ messages }) {
             )}
           </div>
         ))}
+        <div ref={conversationEnd} />
       </div>
       <Form onSubmit={handleSendMessage} className="w-100 framed-top">
         <Container
