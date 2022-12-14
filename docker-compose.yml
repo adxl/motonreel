@@ -18,7 +18,7 @@ services:
     volumes:
       - ./server:/usr/src/app
     command: sh -c "npm install && npm run start"
-    env_file: ./server/.env 
+    env_file: ./server/.env
 
   db:
     image: postgres:13-alpine

@@ -26,6 +26,7 @@ export function AuthProvider({ children }) {
         setUser(data);
       })
       .catch((_) => {
+        sessionStorage.setItem("motonreel-token", JSON.stringify(null));
         location.href = "/login";
       });
   };
@@ -43,7 +44,7 @@ export function AuthProvider({ children }) {
     return new Promise((_, reject) => {
       login(email, password)
         .then(({ data: user }) => {
-          setToken(user.token);
+          setToken("Bearer " + user.token);
           location.href = "/";
         })
         .catch((error) => {

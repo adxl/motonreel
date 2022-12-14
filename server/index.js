@@ -2,8 +2,10 @@ require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
+const http = require("http");
 
 const app = express();
+const server = http.createServer(app);
 const auth = require("./middlewares/auth");
 
 const corsConfig = {
@@ -68,7 +70,11 @@ app.post("/commRequests/create", auth, commRequest.create);
 
 app.patch("/commRequests/:id", auth, commRequest.update);
 
+/* Socket */
+const initMessengerSocket = require("./controllers/socket.controller");
+initMessengerSocket(server);
+
 const { PORT } = process.env;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Running on http://0.0.0.0:${PORT}`);
 });
