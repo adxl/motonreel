@@ -82,6 +82,14 @@ const clients = [];
 app.get("/events", (req, res) => {
   const id = crypto.randomBytes(16).toString("hex"); //req.user.token;
 
+  const headers = {
+    "Content-Type": "text/event-stream",
+    Connection: "keep-alive",
+    "Cache-Control": "no-cache",
+  };
+
+  res.writeHead(200, headers);
+
   clients.push({ id, res });
 
   console.log(clients.map((e) => e.id));
@@ -95,14 +103,8 @@ app.get("/events", (req, res) => {
 
 app.post("/notification", (req, res) => {
   const message = req.body.message;
-  const headers = {
-    "Content-Type": "text/event-stream",
-    Connection: "keep-alive",
-    "Cache-Control": "no-cache",
-  };
 
   for (let client of clients) {
-    client.res.writeHead(200, headers);
     client.res.write(`data: ${message}\n\n`);
   }
 

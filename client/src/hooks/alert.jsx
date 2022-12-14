@@ -11,12 +11,12 @@ export function AlertProvider({ children }) {
   });
   const [_isVisible, setIsVisible] = useState(false);
 
-  function sendAlert(message, type) {
+  function sendAlert(message, type, timeout = 1500) {
     setAlert({ type, message });
     setIsVisible(true);
     setTimeout(() => {
       setIsVisible(false);
-    }, 1500);
+    }, timeout);
   }
 
   function alertSuccess(message) {
@@ -27,10 +27,15 @@ export function AlertProvider({ children }) {
     sendAlert(message, "danger");
   }
 
+  function alertInfo(message) {
+    sendAlert(message, "info", 10000);
+  }
+
   const value = useMemo(
     () => ({
       alertSuccess,
       alertError,
+      alertInfo,
     }),
     []
   );

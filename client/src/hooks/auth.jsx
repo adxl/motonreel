@@ -7,7 +7,8 @@ import React, {
   useState,
 } from "react";
 
-import { getCurrentUser, login } from "../api/auth";
+import { getCurrentUser, login } from "@api/auth";
+import { useAlert } from "@hooks/alert";
 
 const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
@@ -18,6 +19,8 @@ export function AuthProvider({ children }) {
     JSON.parse(sessionStorage.getItem("motonreel-token"))
   );
 
+  const { alertInfo } = useAlert();
+
   const eventSource = React.useMemo(() => {
     if (_token) {
       const es = new EventSource(import.meta.env.VITE_API_URL + "/events");
@@ -27,7 +30,7 @@ export function AuthProvider({ children }) {
       };
 
       es.onmessage = (event) => {
-        console.log(event.data);
+        alertInfo(event.data);
       };
 
       return es;
