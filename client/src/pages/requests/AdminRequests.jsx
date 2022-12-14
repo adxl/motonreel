@@ -62,7 +62,7 @@ export default function AdminRequests() {
             <Card.Body>
               <h2>Conseillers</h2>
               <div className="d-flex align-items-center">
-                <p className="m-0">
+                <p className="m-0 text-nowrap">
                   Mon status : {formatDisponibility(user.disponibility)}
                 </p>
                 &nbsp;

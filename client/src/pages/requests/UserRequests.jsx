@@ -79,6 +79,7 @@ export default function UserRequests() {
                       <td style={tdStyle}>Disponible</td>
                       <td style={tdStyle}>
                         <Button
+                          className="text-nowrap"
                           onClick={() => {
                             handleRequest(advisor.id);
                           }}
@@ -120,7 +121,7 @@ export default function UserRequests() {
                         {request.status ===
                           "23fb3b0e-c5bd-4dc3-b186-60be4987fd7c" && (
                           <Link to={`/requests/${request.id}`}>
-                            Accéder tchat
+                            Accéder au tchat
                           </Link>
                         )}
                       </td>
