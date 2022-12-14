@@ -142,6 +142,10 @@ db.rendezVousType.hasMany(db.rendezVous, {
     allowNull: false,
   },
 });
+
+db.rendezVous.belongsTo(db.rendezVousType, {
+  foreignKey: "type",
+});
 db.users.hasMany(db.rendezVous, {
   foreignKey: {
     name: "client",
@@ -167,9 +171,10 @@ const initDatabase = async () => {
     },
   });
 
+  /* TABLE CommRequestStatus */
   await db.CommRequestStatus.create({
     id: "a57014e4-19bd-471c-979a-1c77cc16ad4a",
-    name: "En cours",
+    name: "En attente",
   });
 
   await db.CommRequestStatus.create({
@@ -185,6 +190,39 @@ const initDatabase = async () => {
   await db.CommRequestStatus.create({
     id: "770fbb69-658a-4dc9-b5ed-26ae596793a7",
     name: "Terminée",
+  });
+
+  /* TABLE RendezVousType */
+
+  await db.rendezVousType.destroy({
+    where: {
+      [Op.or]: [
+        { id: "a3b548d9-f83a-4738-ace7-d104671b07c3" },
+        { id: "9f937831-47ee-4a22-9249-cbacf9d1f3f6" },
+        { id: "74e2746c-48e3-4caa-bccf-a0be5b1107be" },
+        { id: "fb0c3373-9ff7-4290-9bac-cac5503108ea" },
+      ],
+    },
+  });
+
+  await db.rendezVousType.create({
+    id: "a3b548d9-f83a-4738-ace7-d104671b07c3",
+    name: "Classique",
+  });
+
+  await db.rendezVousType.create({
+    id: "9f937831-47ee-4a22-9249-cbacf9d1f3f6",
+    name: "Routier",
+  });
+
+  await db.rendezVousType.create({
+    id: "74e2746c-48e3-4caa-bccf-a0be5b1107be",
+    name: "Tout-terrains",
+  });
+
+  await db.rendezVousType.create({
+    id: "fb0c3373-9ff7-4290-9bac-cac5503108ea",
+    name: "Sportif",
   });
 
   console.log("Database synced");

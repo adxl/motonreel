@@ -1,5 +1,5 @@
-const { verifyToken } = require('../lib/jwt');
-const db = require('../db').db;
+const { verifyToken } = require("../lib/jwt");
+const db = require("../db").db;
 const Users = db.users;
 
 module.exports = async (req, res, next) => {
@@ -9,7 +9,7 @@ module.exports = async (req, res, next) => {
   }
 
   const [type, token] = header.split(/\s+/);
-  if (type !== 'Bearer') {
+  if (type !== "Bearer") {
     return res.sendStatus(401);
   }
 
@@ -24,11 +24,12 @@ module.exports = async (req, res, next) => {
       {
         // permet de récupérer des données de jointure
         // include: [],
-      },
+      }
     );
 
     if (!req.user) return res.sendStatus(404);
 
+    req.user.isUser = !user.isAdmin;
     return next();
   }
 
