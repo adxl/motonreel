@@ -18,6 +18,22 @@ export function AuthProvider({ children }) {
     JSON.parse(sessionStorage.getItem("motonreel-token"))
   );
 
+  const eventSource = React.useMemo(() => {
+    if (_token) {
+      const es = new EventSource(import.meta.env.VITE_API_URL + "/events");
+
+      es.onopen = () => {
+        console.log("ready to collect events !");
+      };
+
+      es.onmessage = (event) => {
+        console.log(event.data);
+      };
+
+      return es;
+    }
+  }, [_token]);
+
   const refreshUser = () => {
     if (!_token) return;
 
@@ -33,6 +49,7 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     refreshUser();
+    return () => eventSource && eventSource.close();
   }, []);
 
   useEffect(() => {
@@ -55,6 +72,7 @@ export function AuthProvider({ children }) {
 
   const handleLogout = useCallback(() => {
     setToken(null);
+    eventSource.close();
     location.href = "/login";
   }, []);
 

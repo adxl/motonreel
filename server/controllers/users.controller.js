@@ -6,7 +6,6 @@ const Users = db.users;
 const Salon = db.salon;
 const CommRequest = db.commRequest;
 const SalonController = require("./salon.controller");
-const { Op } = require("sequelize");
 
 // TODO : Apart from create, connected user access
 
