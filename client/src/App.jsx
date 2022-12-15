@@ -31,12 +31,14 @@ const ChatBot = React.lazy(() => import("@pages/chatbot"));
 
 const Error = React.lazy(() => import("@pages/Error"));
 
+import Container from "react-bootstrap/Container";
+
 import { AlertProvider } from "@hooks/alert";
 import { AuthProvider } from "@hooks/auth";
 
 export default function App() {
   return (
-    <div id="app">
+    <Container fluid id="app">
       <AlertProvider>
         <AuthProvider>
           <Suspense fallback={"Chargement..."}>
@@ -103,6 +105,6 @@ export default function App() {
           </Suspense>
         </AuthProvider>
       </AlertProvider>
-    </div>
+    </Container>
   );
 }

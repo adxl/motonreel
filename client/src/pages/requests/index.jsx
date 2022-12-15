@@ -13,7 +13,7 @@ export default function CommunicationRequests() {
 
   return (
     <Container>
-      <h1>Accueil</h1>
+      <h1 className="mb-4">Demandes de communication</h1>
       <React.Suspense fallback="Chargement...">
         {isAdmin ? <AdminRequests /> : <UserRequests />}
       </React.Suspense>

@@ -4,6 +4,7 @@ import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 
+import Avatar from "@components/chat/Avatar";
 import { useAuth } from "@hooks/auth";
 import { SocketProvider, useSocket } from "@hooks/chat";
 
@@ -69,7 +70,7 @@ function ChatConversation({ messages }) {
 
   return (
     <div>
-      <div className="mb-5 chat-area">
+      <Container className="mb-5 chat-area px-4">
         {messages.map(({ id, content, senderUser }) => (
           <div key={id} className="mb-2">
             {senderUser.id === user.id ? (
@@ -79,7 +80,8 @@ function ChatConversation({ messages }) {
                 </Badge>
               </div>
             ) : (
-              <div className="d-flex justify-content-start">
+              <div className="d-flex justify-content-start align-items-end">
+                <Avatar seed={senderUser.id} />
                 <div className="d-flex flex-column">
                   <span className="text-muted">{senderUser.name}</span>
                   <Badge pill bg="secondary" className="p-2">
@@ -91,7 +93,7 @@ function ChatConversation({ messages }) {
           </div>
         ))}
         <div ref={conversationEnd} />
-      </div>
+      </Container>
       <Form onSubmit={handleSendMessage} className="w-100 framed-top">
         <Container
           fluid

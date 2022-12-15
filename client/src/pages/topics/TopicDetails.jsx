@@ -20,11 +20,14 @@ export default function ForumDetails() {
     loadSalon();
   }, []);
 
-  function loadSalon() {
-    getSalon(topicId, token).then(({ data: salon }) => {
-      setSalon(salon);
-      setMessages(salon.Messages);
-      setLoaded(true);
+  async function loadSalon() {
+    return new Promise((resolve) => {
+      getSalon(topicId, token).then(({ data: salon }) => {
+        setSalon(salon);
+        setMessages(salon.Messages);
+        setLoaded(true);
+        resolve();
+      });
     });
   }
 

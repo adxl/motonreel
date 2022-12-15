@@ -101,7 +101,10 @@ exports.findAdvisors = async (req, res) => {
 
   if (!reqUser.isAdmin) {
     const advisors = await Users.findAll({
-      where: { isAdmin: true, disponibility: true },
+      where: {
+        isAdmin: true,
+        disponibility: true,
+      },
     });
 
     const commRequests = await CommRequest.findAll({
@@ -129,7 +132,10 @@ exports.findAdvisors = async (req, res) => {
   }
 
   const advisors = await Users.findAll({
-    where: { isAdmin: true },
+    where: {
+      isAdmin: true,
+      [Op.not]: { id: reqUser.id },
+    },
     attributes: { exclude: ["password", "token"] },
   });
 

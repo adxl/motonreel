@@ -36,6 +36,7 @@ module.exports = (server) => {
           roomCurrentSize < roomSize - 1
         ) {
           socket.join(roomId);
+          socket.emit("joined");
           console.log(`--> ${userName} JOINED room ${roomId}`);
         } else {
           socket.emit("overflow");

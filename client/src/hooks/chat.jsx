@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
+import { Spinner } from "react-bootstrap";
 import io from "socket.io-client";
 
 import { useAlert } from "@hooks/alert";
@@ -24,6 +25,7 @@ export function SocketProvider({
   const { alertError } = useAlert();
 
   const [_socket, setSocket] = useState();
+  const [_isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     const socketUrl = import.meta.env.VITE_API_URL + "/" + namespace;
@@ -35,13 +37,16 @@ export function SocketProvider({
       transports: ["websocket", "polling", "flashsocket"],
     });
 
+    socket.on("joined", () => {
+      setIsLoaded(true);
+    });
     socket.on("overflow", () => {
       alertError(
         "Vous ne pouvez pas rejoindre cette communication pour le moment"
       );
       setTimeout(() => {
         location.href = "/forum";
-      }, 1000);
+      }, 1500);
     });
 
     socket.emit("join", { roomId, roomSize });
@@ -53,8 +58,9 @@ export function SocketProvider({
   useEffect(() => {
     if (_socket) {
       _socket.on("message", () => {
-        console.log("slt");
-        onReload();
+        onReload().then(() => {
+          setIsLoaded(true);
+        });
       });
     }
   }, [_socket]);
@@ -70,7 +76,7 @@ export function SocketProvider({
 
   return (
     <SocketContext.Provider value={{ sendMessage }}>
-      {children}
+      {!_isLoaded ? <Spinner className="my-5" /> : children}
     </SocketContext.Provider>
   );
 }

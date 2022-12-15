@@ -73,139 +73,136 @@ export default function AdminRequests() {
   }
 
   function formatDisponibility(disponibility) {
-    return disponibility ? "Disponible" : "Non Disponible";
+    return disponibility ? "Disponible" : "Indisponible";
   }
 
   return (
     <Container>
       <Row>
-        <Col>
+        <Col xs="12" className="mb-4">
           <Card>
             <Card.Body>
               <h2>Conseillers</h2>
-
-              <div className="d-flex align-items-center">
-                <p className="m-0 text-nowrap">
-                  Mon status : {formatDisponibility(user.disponibility)}
-                </p>
+              <div className="d-flex align-items-center justify-content-end mb-4 ">
+                <p className="m-0 text-nowrap">Mon status :</p>
                 &nbsp;
-                <Button type="button" onClick={handleChangeDisponibility}>
-                  Changer
+                <Button
+                  type="button"
+                  onClick={handleChangeDisponibility}
+                  variant={user.disponibility ? "success" : "secondary"}
+                >
+                  {formatDisponibility(user.disponibility)}
                 </Button>
               </div>
-              {_advisors.length ? (
-                <Table striped bordered hover>
-                  <thead>
-                    <tr>
-                      <th>Nom</th>
-                      <th>Status</th>
+              <Table striped bordered hover>
+                <thead>
+                  <tr>
+                    <th>Nom</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {_advisors.map((advisor) => (
+                    <tr key={advisor.id}>
+                      <td>{advisor.name}</td>
+                      <td>{formatDisponibility(advisor.disponibility)}</td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {_advisors.map((advisor) => (
-                      <tr key={advisor.id}>
-                        <td>{advisor.name}</td>
-                        <td>{formatDisponibility(advisor.disponibility)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
-              ) : (
-                <p>Vous ne possédez aucun autre conseiller</p>
-              )}
+                  ))}
+                </tbody>
+              </Table>
             </Card.Body>
           </Card>
         </Col>
 
-        {_requests.length > 0 && (
-          <Col>
-            <Card>
-              <Card.Body>
-                <h2>Mes demandes</h2>
-                <Table striped bordered hover>
-                  <thead>
-                    <tr>
-                      <th>Client</th>
-                      <th></th>
+        <Col xs="12" className="mb-4">
+          <Card>
+            <Card.Body>
+              <h2>Mes demandes</h2>
+              <Table striped bordered hover>
+                <thead>
+                  <tr>
+                    <th>Client</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {_requests.map((request) => (
+                    <tr key={request.id}>
+                      <td style={tdStyle}>{request.clientUser.name}</td>
+                      <td style={tdStyle}>{request.requestStatus.name}</td>
+                      {request.status ===
+                        "a57014e4-19bd-471c-979a-1c77cc16ad4a" && (
+                        <td style={tdStyle}>
+                          <Button
+                            variant="success"
+                            type="button"
+                            onClick={() => {
+                              handleChangeStatus(request.id, "Accepter");
+                            }}
+                          >
+                            Accepter
+                          </Button>
+                          <Button
+                            variant="danger"
+                            type="button"
+                            onClick={() => {
+                              handleChangeStatus(request.id, "Refuser");
+                            }}
+                          >
+                            Refuser
+                          </Button>
+                        </td>
+                      )}
+                      {request.status ===
+                        "23fb3b0e-c5bd-4dc3-b186-60be4987fd7c" && (
+                        <td style={tdStyle}>
+                          <Link to={`/requests/${request.id}`}>
+                            Accéder au tchat
+                          </Link>
+                        </td>
+                      )}
                     </tr>
-                  </thead>
-                  <tbody>
-                    {_requests.map((request) => (
-                      <tr key={request.id}>
-                        <td style={tdStyle}>{request.clientUser.name}</td>
-                        <td style={tdStyle}>{request.requestStatus.name}</td>
-                        {request.status ===
-                          "a57014e4-19bd-471c-979a-1c77cc16ad4a" && (
-                          <td style={tdStyle}>
-                            <Button
-                              variant="success"
-                              type="button"
-                              onClick={() => {
-                                handleChangeStatus(request.id, "Accepter");
-                              }}
-                            >
-                              Accepter
-                            </Button>
-                            <Button
-                              variant="danger"
-                              type="button"
-                              onClick={() => {
-                                handleChangeStatus(request.id, "Refuser");
-                              }}
-                            >
-                              Refuser
-                            </Button>
-                          </td>
-                        )}
-                        {request.status ===
-                          "23fb3b0e-c5bd-4dc3-b186-60be4987fd7c" && (
-                          <td style={tdStyle}>
-                            <Link to={`/requests/${request.id}`}>
-                              Accéder au tchat
-                            </Link>
-                          </td>
-                        )}
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
-              </Card.Body>
-            </Card>
-          </Col>
-        )}
+                  ))}
+                </tbody>
+              </Table>
+            </Card.Body>
+          </Card>
+        </Col>
       </Row>
       <Row>
         <Col>
-          <h2>Prochains rendez-vous</h2>
-          {_reservations.length ? (
-            <Table striped bordered hover>
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Type</th>
-                  <th>Client</th>
-                </tr>
-              </thead>
-              <tbody>
-                {_reservations
-                  .sort((a, b) => a.rdvType.name.localeCompare(b.rdvType.name))
-                  .map((reservation) => (
-                    <tr key={reservation.id}>
-                      <td style={tdStyle}>
-                        {new Date(reservation.date).toLocaleDateString(
-                          "fr",
-                          optionsDate
-                        )}
-                      </td>
-                      <td style={tdStyle}>{reservation.rdvType.name}</td>
-                      <td style={tdStyle}>{reservation.rdvClient.name}</td>
-                    </tr>
-                  ))}
-              </tbody>
-            </Table>
-          ) : (
-            <p>Aucune reservations en cours</p>
-          )}
+          <Card>
+            <Card.Body>
+              <h2>Prochains rendez-vous</h2>
+              <Table striped bordered hover>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Client</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {_reservations
+                    .sort((a, b) =>
+                      a.rdvType.name.localeCompare(b.rdvType.name)
+                    )
+                    .map((reservation) => (
+                      <tr key={reservation.id}>
+                        <td style={tdStyle}>
+                          {new Date(reservation.date).toLocaleDateString(
+                            "fr",
+                            optionsDate
+                          )}
+                        </td>
+                        <td style={tdStyle}>{reservation.rdvType.name}</td>
+                        <td style={tdStyle}>{reservation.rdvClient.name}</td>
+                      </tr>
+                    ))}
+                </tbody>
+              </Table>
+            </Card.Body>
+          </Card>
         </Col>
       </Row>
     </Container>

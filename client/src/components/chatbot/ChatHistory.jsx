@@ -1,21 +1,13 @@
 import React from "react";
 import Badge from "react-bootstrap/Badge";
 
-export default function ChatHistory({ history }) {
-  const BotAvatar = React.memo(function BotAvatar() {
-    return (
-      <img
-        src="https://robohash.org/motonreeltr?set=set3"
-        alt="avatar"
-        style={{ width: 50 }}
-      />
-    );
-  });
+import Avatar from "@components/chat/Avatar";
 
+export default function ChatHistory({ history }) {
   return history.map((message, i) => (
     <div key={i}>
       <div className="d-flex justify-content-start mb-2 align-items-center">
-        <BotAvatar />
+        <Avatar />
         <Badge pill bg="secondary" className="px-3 py-2">
           {message.question}
         </Badge>
