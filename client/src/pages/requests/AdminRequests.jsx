@@ -10,6 +10,8 @@ import { Link } from "react-router-dom";
 import { update } from "@api/advisors";
 import { getAdvisors } from "@api/advisors";
 import { getRequests, updateRequest } from "@api/commRequests";
+import { getRendezVous } from "@api/rendezVous";
+import { useAlert } from "@hooks/alert";
 import { useAuth } from "@hooks/auth";
 
 const tdStyle = {
@@ -18,20 +20,40 @@ const tdStyle = {
 
 export default function AdminRequests() {
   const { user, token, refreshUser } = useAuth();
+  const { alertError } = useAlert();
 
-  const [advisors, setAdvisors] = React.useState([]);
-  const [requests, setRequests] = React.useState([]);
+  const [_advisors, setAdvisors] = React.useState([]);
+  const [_requests, setRequests] = React.useState([]);
+  const [_reservations, setReservations] = React.useState([]);
+
+  const optionsDate = {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  };
 
   const loadRequests = () =>
     getRequests(token).then(({ data: requests }) => {
       setRequests(requests);
     });
 
+  const loadRendezVous = () =>
+    getRendezVous(token)
+      .then(({ data: reservations }) => {
+        setReservations(reservations);
+      })
+      .catch((err) => {
+        console.log(err);
+        alertError("Impossible de récupérer les rendez-vous");
+      });
+
   React.useEffect(() => {
     getAdvisors(token).then(({ data: advisors }) => {
       setAdvisors(advisors);
     });
     loadRequests();
+    loadRendezVous();
   }, []);
 
   function handleChangeStatus(id, status) {
@@ -61,6 +83,7 @@ export default function AdminRequests() {
           <Card>
             <Card.Body>
               <h2>Conseillers</h2>
+
               <div className="d-flex align-items-center">
                 <p className="m-0 text-nowrap">
                   Mon status : {formatDisponibility(user.disponibility)}
@@ -70,83 +93,119 @@ export default function AdminRequests() {
                   Changer
                 </Button>
               </div>
-              <Table striped bordered hover>
-                <thead>
-                  <tr>
-                    <th>Nom</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {advisors.map((advisor) => (
-                    <tr key={advisor.id}>
-                      <td>{advisor.name}</td>
-                      <td>
-                        {advisor.disponibility
-                          ? "Disponible"
-                          : "Non Disponible"}
-                      </td>
+              {_advisors.length ? (
+                <Table striped bordered hover>
+                  <thead>
+                    <tr>
+                      <th>Nom</th>
+                      <th>Status</th>
                     </tr>
-                  ))}
-                </tbody>
-              </Table>
+                  </thead>
+                  <tbody>
+                    {_advisors.map((advisor) => (
+                      <tr key={advisor.id}>
+                        <td>{advisor.name}</td>
+                        <td>{formatDisponibility(advisor.disponibility)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              ) : (
+                <p>Vous ne possédez aucun autre conseiller</p>
+              )}
             </Card.Body>
           </Card>
         </Col>
 
+        {_requests.length > 0 && (
+          <Col>
+            <Card>
+              <Card.Body>
+                <h2>Mes demandes</h2>
+                <Table striped bordered hover>
+                  <thead>
+                    <tr>
+                      <th>Client</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {_requests.map((request) => (
+                      <tr key={request.id}>
+                        <td style={tdStyle}>{request.clientUser.name}</td>
+                        <td style={tdStyle}>{request.requestStatus.name}</td>
+                        {request.status ===
+                          "a57014e4-19bd-471c-979a-1c77cc16ad4a" && (
+                          <td style={tdStyle}>
+                            <Button
+                              variant="success"
+                              type="button"
+                              onClick={() => {
+                                handleChangeStatus(request.id, "Accepter");
+                              }}
+                            >
+                              Accepter
+                            </Button>
+                            <Button
+                              variant="danger"
+                              type="button"
+                              onClick={() => {
+                                handleChangeStatus(request.id, "Refuser");
+                              }}
+                            >
+                              Refuser
+                            </Button>
+                          </td>
+                        )}
+                        {request.status ===
+                          "23fb3b0e-c5bd-4dc3-b186-60be4987fd7c" && (
+                          <td style={tdStyle}>
+                            <Link to={`/requests/${request.id}`}>
+                              Accéder au tchat
+                            </Link>
+                          </td>
+                        )}
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </Card.Body>
+            </Card>
+          </Col>
+        )}
+      </Row>
+      <Row>
         <Col>
-          <Card>
-            <Card.Body>
-              <h2>Mes demandes</h2>
-              <Table striped bordered hover>
-                <thead>
-                  <tr>
-                    <th>Client</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {requests.map((request) => (
-                    <tr key={request.id}>
-                      <td style={tdStyle}>{request.clientUser.name}</td>
-                      <td style={tdStyle}>{request.requestStatus.name}</td>
-                      {request.status ===
-                        "a57014e4-19bd-471c-979a-1c77cc16ad4a" && (
-                        <td style={tdStyle}>
-                          <Button
-                            variant="success"
-                            type="button"
-                            onClick={() => {
-                              handleChangeStatus(request.id, "Accepter");
-                            }}
-                          >
-                            Accepter
-                          </Button>
-                          <Button
-                            variant="danger"
-                            type="button"
-                            onClick={() => {
-                              handleChangeStatus(request.id, "Refuser");
-                            }}
-                          >
-                            Refuser
-                          </Button>
-                        </td>
-                      )}
-                      {request.status ===
-                        "23fb3b0e-c5bd-4dc3-b186-60be4987fd7c" && (
-                        <td style={tdStyle}>
-                          <Link to={`/requests/${request.id}`}>
-                            Accéder au tchat
-                          </Link>
-                        </td>
-                      )}
+          <h2>Prochains rendez-vous</h2>
+          {_reservations.length ? (
+            <Table striped bordered hover>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Type</th>
+                  <th>Client</th>
+                </tr>
+              </thead>
+              <tbody>
+                {_reservations
+                  .sort((a, b) => a.rdvType.name.localeCompare(b.rdvType.name))
+                  .map((reservation) => (
+                    <tr key={reservation.id}>
+                      <td style={tdStyle}>
+                        {new Date(reservation.date).toLocaleDateString(
+                          "fr",
+                          optionsDate
+                        )}
+                      </td>
+                      <td style={tdStyle}>{reservation.rdvType.name}</td>
+                      <td style={tdStyle}>{reservation.rdvClient.name}</td>
                     </tr>
                   ))}
-                </tbody>
-              </Table>
-            </Card.Body>
-          </Card>
+              </tbody>
+            </Table>
+          ) : (
+            <p>Aucune reservations en cours</p>
+          )}
         </Col>
       </Row>
     </Container>
