@@ -22,7 +22,7 @@ export function AuthProvider({ children }) {
   const { alertInfo } = useAlert();
 
   const eventSource = React.useMemo(() => {
-    if (_token) {
+    if (_user.id && !_user.isAdmin) {
       const es = new EventSource(import.meta.env.VITE_API_URL + "/events");
 
       es.onopen = () => {
@@ -30,9 +30,7 @@ export function AuthProvider({ children }) {
       };
 
       es.onmessage = function (event) {
-        if (_user.id && !_user.isAdmin) {
-          alertInfo(event.data);
-        }
+        alertInfo(event.data);
       };
 
       return es;
