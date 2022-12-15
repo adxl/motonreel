@@ -105,6 +105,17 @@ exports.findOne = async (req, res) => {
           as: "advisorUser",
           attributes: ["name"],
         },
+        {
+          model: db.message,
+          as: "Messages",
+          include: [
+            {
+              model: db.users,
+              as: "senderUser",
+              attributes: ["id", "name"],
+            },
+          ],
+        },
       ],
     });
 
@@ -115,6 +126,8 @@ exports.findOne = async (req, res) => {
     if (commRequest.client !== reqUser.id) {
       return res.status(403).json({ message: "Access denied !" });
     }
+
+    return res.status(200).json(commRequest);
   }
 
   const commRequest = await CommRequest.findByPk(id, {
@@ -123,6 +136,17 @@ exports.findOne = async (req, res) => {
         model: db.users,
         as: "clientUser",
         attributes: ["name"],
+      },
+      {
+        model: db.message,
+        as: "Messages",
+        include: [
+          {
+            model: db.users,
+            as: "senderUser",
+            attributes: ["id", "name"],
+          },
+        ],
       },
     ],
   });
