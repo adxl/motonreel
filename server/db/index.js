@@ -15,7 +15,6 @@ const { DataTypes } = Sequelize;
 const connection = new Sequelize(process.env.DATABASE_URL, {
   useNewUrlParser: true,
   dialectOptions,
-  logging: false,
 });
 
 const db = {};
@@ -152,8 +151,21 @@ db.rendezVousType.hasMany(db.rendezVous, {
 });
 
 db.rendezVous.belongsTo(db.rendezVousType, {
-  foreignKey: "type",
+  foreignKey: {
+    name: "type",
+    allowNull: false,
+  },
+  as: "rdvType",
 });
+
+db.rendezVous.belongsTo(db.users, {
+  foreignKey: {
+    name: "client",
+    allowNull: false,
+  },
+  as: "rdvClient",
+});
+
 db.users.hasMany(db.rendezVous, {
   foreignKey: {
     name: "client",

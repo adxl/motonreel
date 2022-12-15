@@ -41,21 +41,22 @@ exports.create = async (req, res) => {
 };
 
 exports.findAll = async (req, res) => {
-  const type = req.query.type;
+  // const type = req.query.type;
 
   if (req.user.isUser) {
-    const where = {
-      date: { [Op.gte]: Date() },
-    };
-
-    if (type) {
-      where.type = type;
-    }
-
     const rendezVous = await RendezVous.findAll({
-      include: RendezVousType,
+      where: {
+        [Op.and]: [{ client: req.user.id }, { date: { [Op.gte]: Date() } }],
+      },
+      order: [["date", "ASC"]],
       attributes: { exclude: ["client"] },
-      where,
+      include: [
+        {
+          model: db.rendezVousType,
+          as: "rdvType",
+          attributes: ["name"],
+        },
+      ],
     });
 
     return res.status(200).json(rendezVous);
@@ -63,6 +64,19 @@ exports.findAll = async (req, res) => {
 
   const rendezVous = await RendezVous.findAll({
     where: { date: { [Op.gte]: Date() } },
+    order: [["date", "ASC"]],
+    include: [
+      {
+        model: db.rendezVousType,
+        as: "rdvType",
+        attributes: ["name"],
+      },
+      {
+        model: db.users,
+        as: "rdvClient",
+        attributes: ["name"],
+      },
+    ],
   });
 
   return res.status(200).json(rendezVous);
