@@ -7,6 +7,7 @@ const http = require("http");
 const app = express();
 const server = http.createServer(app);
 const auth = require("./middlewares/auth");
+const crypto = require("crypto");
 
 const corsConfig = {
   origin: "http://localhost:3000",
@@ -73,6 +74,40 @@ app.patch("/commRequests/:id", auth, commRequest.update);
 /* Socket */
 const initMessengerSocket = require("./controllers/socket.controller");
 initMessengerSocket(server);
+
+/* SSE */
+
+const clients = [];
+
+app.get("/events", (req, res) => {
+  const id = crypto.randomBytes(16).toString("hex"); //req.user.token;
+
+  const headers = {
+    "Content-Type": "text/event-stream",
+    Connection: "keep-alive",
+    "Cache-Control": "no-cache",
+  };
+
+  res.writeHead(200, headers);
+
+  clients.push({ id, res });
+
+  req.on("close", () => {
+    clients.filter((client) => {
+      client.id !== id;
+    });
+  });
+});
+
+app.post("/notification", (req, res) => {
+  const message = req.body.message;
+
+  for (let client of clients) {
+    client.res.write(`data: ${message}\n\n`);
+  }
+
+  return res.sendStatus(204);
+});
 
 const { PORT } = process.env;
 server.listen(PORT, () => {

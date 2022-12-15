@@ -6,7 +6,6 @@ const Users = db.users;
 const Salon = db.salon;
 const CommRequest = db.commRequest;
 const SalonController = require("./salon.controller");
-const { Op } = require("sequelize");
 
 // TODO : Apart from create, connected user access
 
@@ -88,12 +87,7 @@ exports.login = async (req, res) => {
 };
 
 exports.findOneByToken = async (req, res) => {
-  const user = req.user;
-
-  delete user.password;
-  delete user.token;
-
-  return res.status(200).json(user);
+  return res.status(200).json(req.user);
 };
 
 exports.findAdvisors = async (req, res) => {

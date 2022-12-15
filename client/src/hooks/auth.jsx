@@ -7,7 +7,8 @@ import React, {
   useState,
 } from "react";
 
-import { getCurrentUser, login } from "../api/auth";
+import { getCurrentUser, login } from "@api/auth";
+import { useAlert } from "@hooks/alert";
 
 const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
@@ -17,6 +18,24 @@ export function AuthProvider({ children }) {
   const [_token, setToken] = useState(
     JSON.parse(sessionStorage.getItem("motonreel-token"))
   );
+
+  const { alertInfo } = useAlert();
+
+  const eventSource = React.useMemo(() => {
+    if (_user.id && !_user.isAdmin) {
+      const es = new EventSource(import.meta.env.VITE_API_URL + "/events");
+
+      es.onopen = () => {
+        console.log("ready to collect events !");
+      };
+
+      es.onmessage = function (event) {
+        alertInfo(event.data);
+      };
+
+      return es;
+    }
+  }, [_user.id]);
 
   const refreshUser = () => {
     if (!_token) return;
@@ -33,6 +52,7 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     refreshUser();
+    return () => eventSource && eventSource.close();
   }, []);
 
   useEffect(() => {
@@ -55,6 +75,7 @@ export function AuthProvider({ children }) {
 
   const handleLogout = useCallback(() => {
     setToken(null);
+    eventSource.close();
     location.href = "/login";
   }, []);
 
