@@ -87,12 +87,7 @@ exports.login = async (req, res) => {
 };
 
 exports.findOneByToken = async (req, res) => {
-  const user = req.user;
-
-  delete user.password;
-  delete user.token;
-
-  return res.status(200).json(user);
+  return res.status(200).json(req.user);
 };
 
 exports.findAdvisors = async (req, res) => {

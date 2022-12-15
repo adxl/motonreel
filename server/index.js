@@ -92,8 +92,6 @@ app.get("/events", (req, res) => {
 
   clients.push({ id, res });
 
-  console.log(clients.map((e) => e.id));
-
   req.on("close", () => {
     clients.filter((client) => {
       client.id !== id;

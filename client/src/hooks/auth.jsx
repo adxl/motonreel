@@ -29,13 +29,15 @@ export function AuthProvider({ children }) {
         console.log("ready to collect events !");
       };
 
-      es.onmessage = (event) => {
-        alertInfo(event.data);
+      es.onmessage = function (event) {
+        if (_user.id && !_user.isAdmin) {
+          alertInfo(event.data);
+        }
       };
 
       return es;
     }
-  }, [_token]);
+  }, [_user.id]);
 
   const refreshUser = () => {
     if (!_token) return;

@@ -25,6 +25,7 @@ async function getUser(authorization) {
     where: {
       email: payload.email,
     },
+    attributes: { exclude: ["password"] },
   });
 
   if (!user) {
