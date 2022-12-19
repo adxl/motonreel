@@ -1,4 +1,5 @@
-const { Sequelize, Op } = require("sequelize");
+const { Sequelize } = require("sequelize");
+const generateFixtures = require("./fixtures");
 
 const isLocal = process.env.STAGE === "local";
 const dialectOptions = !isLocal
@@ -178,72 +179,9 @@ db.users.hasMany(db.rendezVous, {
 const initDatabase = async () => {
   console.log("Initializing database");
 
-  await db.connection.sync({ alter: true, logging: true });
+  await db.connection.sync({ alter: true, logging: true, force: true });
 
-  await db.CommRequestStatus.destroy({
-    where: {
-      [Op.or]: [
-        { id: "a57014e4-19bd-471c-979a-1c77cc16ad4a" },
-        { id: "23fb3b0e-c5bd-4dc3-b186-60be4987fd7c" },
-        { id: "342fc969-aa8f-486c-88b4-821042a01640" },
-        { id: "770fbb69-658a-4dc9-b5ed-26ae596793a7" },
-      ],
-    },
-  });
-
-  /* TABLE CommRequestStatus */
-  await db.CommRequestStatus.create({
-    id: "a57014e4-19bd-471c-979a-1c77cc16ad4a",
-    name: "En attente",
-  });
-
-  await db.CommRequestStatus.create({
-    id: "23fb3b0e-c5bd-4dc3-b186-60be4987fd7c",
-    name: "Acceptée",
-  });
-
-  await db.CommRequestStatus.create({
-    id: "342fc969-aa8f-486c-88b4-821042a01640",
-    name: "Refusée",
-  });
-
-  await db.CommRequestStatus.create({
-    id: "770fbb69-658a-4dc9-b5ed-26ae596793a7",
-    name: "Terminée",
-  });
-
-  /* TABLE RendezVousType */
-
-  await db.rendezVousType.destroy({
-    where: {
-      [Op.or]: [
-        { id: "a3b548d9-f83a-4738-ace7-d104671b07c3" },
-        { id: "9f937831-47ee-4a22-9249-cbacf9d1f3f6" },
-        { id: "74e2746c-48e3-4caa-bccf-a0be5b1107be" },
-        { id: "fb0c3373-9ff7-4290-9bac-cac5503108ea" },
-      ],
-    },
-  });
-
-  await db.rendezVousType.create({
-    id: "a3b548d9-f83a-4738-ace7-d104671b07c3",
-    name: "Classique",
-  });
-
-  await db.rendezVousType.create({
-    id: "9f937831-47ee-4a22-9249-cbacf9d1f3f6",
-    name: "Routier",
-  });
-
-  await db.rendezVousType.create({
-    id: "74e2746c-48e3-4caa-bccf-a0be5b1107be",
-    name: "Tout-terrains",
-  });
-
-  await db.rendezVousType.create({
-    id: "fb0c3373-9ff7-4290-9bac-cac5503108ea",
-    name: "Sportif",
-  });
+  await generateFixtures(db);
 
   console.log("Database synced");
 };
