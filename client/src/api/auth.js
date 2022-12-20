@@ -4,6 +4,10 @@ export function getCurrentUser(token) {
   return _get("/me", token);
 }
 
+export function getUsers(token) {
+  return _get("/users", token);
+}
+
 export function register(name, email, password) {
   const data = { name, email, password };
   return _post("/register", data);

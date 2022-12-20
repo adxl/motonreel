@@ -1,13 +1,12 @@
 const jwt = require("../lib/jwt");
 const bcrypt = require("bcryptjs");
+const { Op } = require("sequelize");
 
 const db = require("../db").db;
 const Users = db.users;
 const Salon = db.salon;
 const CommRequest = db.commRequest;
 const SalonController = require("./salon.controller");
-
-const { Op } = require("sequelize");
 
 // TODO : Apart from create, connected user access
 
@@ -158,6 +157,21 @@ exports.update = async (req, res) => {
       });
     }
   });
+};
+
+exports.findAll = async (req, res) => {
+  const reqUser = req.user;
+
+  const users = await Users.findAll({
+    where: {
+      id: {
+        [Op.ne]: reqUser.id,
+      },
+    },
+    attributes: ["name", "id"],
+  });
+
+  return res.status(200).json(users);
 };
 
 /* Salon relation */
