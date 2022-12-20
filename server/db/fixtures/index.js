@@ -55,10 +55,28 @@ async function generateFixtures(db) {
   /* SALON FIXTURES */
 
   for (let i = 0; i < 10; i++) {
-    await db.salon.create({
+    const salon = {
       name: faker.music.songName(),
       userSize: faker.datatype.number({ min: 15, max: 75 }),
-    });
+    };
+
+    const { id } = await db.salon.create(salon);
+
+    for (let j = 0; j < faker.datatype.number({ min: 0, max: 15 }); j++) {
+      const message = {
+        content: faker.lorem.sentence(
+          faker.datatype.number({ min: 1, max: 20 })
+        ),
+        sender: users[faker.datatype.number({ min: 0, max: 49 })],
+      };
+
+      await db.message.create(message).then((msg) => {
+        db.salonMessage.create({
+          SalonId: id,
+          MessageId: msg.id,
+        });
+      });
+    }
   }
 
   /* COMMREQUEST STATUSES FIXTURES */
@@ -136,7 +154,32 @@ async function generateFixtures(db) {
       status: crStatuses[faker.datatype.number({ min: 0, max: 3 })],
     };
 
-    await db.commRequest.create(commRequest);
+    const { id } = await db.commRequest.create(commRequest);
+
+    if (commRequest.status === "23fb3b0e-c5bd-4dc3-b186-60be4987fd7c") {
+      for (let j = 0; j < faker.datatype.number({ min: 1, max: 10 }); j++) {
+        const isAdvisor = faker.datatype.boolean;
+
+        const message = {
+          content: faker.lorem.sentence(
+            faker.datatype.number({ min: 1, max: 20 })
+          ),
+        };
+
+        if (isAdvisor) {
+          message.sender = commRequest.advisor;
+        } else {
+          message.sender = commRequest.client;
+        }
+
+        await db.message.create(message).then((msg) => {
+          db.commRequestMessage.create({
+            CommRequestId: id,
+            MessageId: msg.id,
+          });
+        });
+      }
+    }
   }
 
   /* RENDEZVOUS FIXTURES */
@@ -146,8 +189,8 @@ async function generateFixtures(db) {
       client: users[faker.datatype.number({ min: 0, max: 49 })],
       type: rdvTypes[faker.datatype.number({ min: 0, max: 3 })],
       date: faker.date.between(
-        "2020-01-01T00:00:00.000Z",
-        "2030-01-01T00:00:00.000Z"
+        "2022-01-01T00:00:00.000Z",
+        "2024-01-01T00:00:00.000Z"
       ),
     };
 
