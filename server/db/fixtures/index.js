@@ -136,7 +136,7 @@ async function generateFixtures(db) {
       status: crStatuses[faker.datatype.number({ min: 0, max: 3 })],
     };
 
-    await db.CommRequest.create(commRequest);
+    await db.commRequest.create(commRequest);
   }
 
   /* RENDEZVOUS FIXTURES */
