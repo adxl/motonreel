@@ -5,6 +5,11 @@
   text-align: center;
 }
 
+main {
+  padding-top: 80px;
+  margin-bottom: 200px;
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -51,3 +56,4 @@ button.btn[disabled] {
   max-height: 50vh;
   overflow-y: scroll;
 }
+

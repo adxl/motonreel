@@ -17,7 +17,9 @@ export default function ProtectedRoute({ el: Element, requireAdmin }) {
   return (
     <>
       <Nav />
-      <Element />
+      <main>
+        <Element />
+      </main>
       {user.isAdmin && <Notification />}
     </>
   );

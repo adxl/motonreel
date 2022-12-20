@@ -28,7 +28,7 @@ export function AlertProvider({ children }) {
   }
 
   function alertInfo(message) {
-    sendAlert(message, "info", 10000);
+    sendAlert(message, "info", 2000);
   }
 
   const value = useMemo(
@@ -41,11 +41,13 @@ export function AlertProvider({ children }) {
   );
 
   return (
-    <AlertContext.Provider value={value}>
-      <Alert variant={_alert.type} show={_isVisible}>
-        {_alert.message}
-      </Alert>
-      {children}
-    </AlertContext.Provider>
+    <div className="pt-5">
+      <AlertContext.Provider value={value}>
+        <Alert variant={_alert.type} show={_isVisible}>
+          {_alert.message}
+        </Alert>
+        {children}
+      </AlertContext.Provider>
+    </div>
   );
 }

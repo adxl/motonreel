@@ -55,7 +55,8 @@ app.post("/users/removeSalon", auth, users.removeSalon);
 
 const rendezVous = require("./controllers/rendezVous.controller");
 
-app.get("/rendezvous", auth, rendezVous.findAll);
+app.get("/rendezvous/all", rendezVous.findAll);
+app.get("/rendezvous/self", auth, rendezVous.findAllByUser);
 
 app.post("/rendezvous/create", auth, rendezVous.create);
 

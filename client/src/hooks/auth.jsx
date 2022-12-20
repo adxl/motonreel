@@ -25,12 +25,8 @@ export function AuthProvider({ children }) {
     if (_user.id && !_user.isAdmin) {
       const es = new EventSource(import.meta.env.VITE_API_URL + "/events");
 
-      es.onopen = () => {
-        console.log("ready to collect events !");
-      };
-
       es.onmessage = function (event) {
-        alertInfo(event.data);
+        alertInfo("ANNONCE DE LA PLATEFORME : " + event.data);
       };
 
       return es;
@@ -77,7 +73,7 @@ export function AuthProvider({ children }) {
     setToken(null);
     eventSource.close();
     location.href = "/login";
-  }, []);
+  }, [eventSource]);
 
   const value = useMemo(
     () => ({

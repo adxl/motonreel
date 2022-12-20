@@ -9,7 +9,7 @@ import { Link } from "react-router-dom";
 
 import { getAdvisors } from "@api/advisors";
 import { createRequest, getRequests } from "@api/commRequests";
-import { getRendezVous } from "@api/rendezVous";
+import { getUserRendezVous } from "@api/rendezVous";
 import { useAlert } from "@hooks/alert";
 import { useAuth } from "@hooks/auth";
 const tdStyle = {
@@ -41,7 +41,7 @@ export default function UserRequests() {
       });
 
   const loadRendezVous = () =>
-    getRendezVous(token)
+    getUserRendezVous(token)
       .then(({ data: reservations }) => {
         setReservations(reservations);
       })
@@ -157,7 +157,7 @@ export default function UserRequests() {
           </Card>
         </Col>
       </Row>
-      <Row>
+      <Row className="mt-5">
         <Col>
           <h2>Mes prochains rendez-vous</h2>
 
@@ -170,19 +170,17 @@ export default function UserRequests() {
                 </tr>
               </thead>
               <tbody>
-                {_reservations
-                  .sort((a, b) => a.rdvType.name.localeCompare(b.rdvType.name))
-                  .map((reservation) => (
-                    <tr key={reservation.id}>
-                      <td style={tdStyle}>
-                        {new Date(reservation.date).toLocaleDateString(
-                          "fr",
-                          optionsDate
-                        )}
-                      </td>
-                      <td style={tdStyle}>{reservation.rdvType.name}</td>
-                    </tr>
-                  ))}
+                {_reservations.map((reservation) => (
+                  <tr key={reservation.id}>
+                    <td style={tdStyle}>
+                      {new Date(reservation.date).toLocaleDateString(
+                        "fr",
+                        optionsDate
+                      )}
+                    </td>
+                    <td style={tdStyle}>{reservation.rdvType.name}</td>
+                  </tr>
+                ))}
               </tbody>
             </Table>
           ) : (

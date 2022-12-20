@@ -41,12 +41,32 @@ exports.create = async (req, res) => {
 };
 
 exports.findAll = async (req, res) => {
-  // const type = req.query.type;
+  const where = {
+    [Op.and]: [{ date: { [Op.gte]: new Date(Date()).toISOString() } }],
+  };
 
+  const { type } = req.query;
+  if (type) {
+    where.type = type;
+  }
+
+  const rendezVous = await RendezVous.findAll({
+    where,
+    order: [["date", "ASC"]],
+    attributes: { exclude: ["client"] },
+  });
+
+  return res.status(200).json(rendezVous);
+};
+
+exports.findAllByUser = async (req, res) => {
   if (req.user.isUser) {
     const rendezVous = await RendezVous.findAll({
       where: {
-        [Op.and]: [{ client: req.user.id }, { date: { [Op.gte]: Date() } }],
+        [Op.and]: [
+          { client: req.user.id },
+          { date: { [Op.gte]: new Date(Date()).toISOString() } },
+        ],
       },
       order: [["date", "ASC"]],
       attributes: { exclude: ["client"] },
@@ -63,7 +83,9 @@ exports.findAll = async (req, res) => {
   }
 
   const rendezVous = await RendezVous.findAll({
-    where: { date: { [Op.gte]: Date() } },
+    where: {
+      date: { [Op.gte]: new Date(Date()).toISOString() },
+    },
     order: [["date", "ASC"]],
     include: [
       {
@@ -79,5 +101,6 @@ exports.findAll = async (req, res) => {
     ],
   });
 
+  console.log();
   return res.status(200).json(rendezVous);
 };

@@ -32,6 +32,7 @@ async function getUser(authorization) {
     throwTokenError();
   }
 
+  user.isUser = !user.isAdmin;
   return user;
 }
 

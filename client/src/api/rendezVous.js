@@ -1,12 +1,16 @@
 import { _get, _post } from "./gateway";
 
-export function getRendezVous(token, type = null) {
-  let path = "/rendezvous";
+export function getAllRendezVous(type = null) {
+  let path = "/rendezvous/all";
 
   if (type) {
     path += "?type=" + type;
   }
-  return _get(path, token);
+  return _get(path);
+}
+
+export function getUserRendezVous(token) {
+  return _get("/rendezvous/self", token);
 }
 
 export function createRendezVous(date, type, token) {

@@ -12,9 +12,10 @@
 - `$ docker-compose build --pull --no-cache`  
 - `$ docker-compose up -d`  
 
-3 - Run the migrations
+3 - Run the migrations and the fixtures:
 
 - `$ docker container exec motonreel_server node migrate.js`  
+- NOTE: default password for fixtures' users is : `socket`  
 
 4 - Navigate to:
 

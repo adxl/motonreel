@@ -22,7 +22,7 @@ export default React.memo(function Header() {
 
   return (
     <Navbar
-      className="dashboard-header"
+      className="nav-header"
       fixed="top"
       bg="dark"
       variant="dark"

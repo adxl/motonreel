@@ -31,7 +31,7 @@ async function generateFixtures(db) {
     };
 
     user.token = await jwt.createToken(user);
-    user.password = await bcrypt.hash(faker.internet.password(), salt);
+    user.password = await bcrypt.hash("socket", salt);
 
     const { id } = await db.users.create(user);
     admins.push(id);
@@ -46,7 +46,7 @@ async function generateFixtures(db) {
     };
 
     user.token = await jwt.createToken(user);
-    user.password = await bcrypt.hash(faker.internet.password(), salt);
+    user.password = await bcrypt.hash("socket", salt);
 
     const { id } = await db.users.create(user);
     users.push(id);
@@ -189,7 +189,7 @@ async function generateFixtures(db) {
       client: users[faker.datatype.number({ min: 0, max: 49 })],
       type: rdvTypes[faker.datatype.number({ min: 0, max: 3 })],
       date: faker.date.between(
-        "2022-01-01T00:00:00.000Z",
+        "2022-12-20T00:00:00.000Z",
         "2024-01-01T00:00:00.000Z"
       ),
     };

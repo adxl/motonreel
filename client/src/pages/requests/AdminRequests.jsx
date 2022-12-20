@@ -10,7 +10,7 @@ import { Link } from "react-router-dom";
 import { update } from "@api/advisors";
 import { getAdvisors } from "@api/advisors";
 import { getRequests, updateRequest } from "@api/commRequests";
-import { getRendezVous } from "@api/rendezVous";
+import { getUserRendezVous } from "@api/rendezVous";
 import { useAlert } from "@hooks/alert";
 import { useAuth } from "@hooks/auth";
 
@@ -39,7 +39,7 @@ export default function AdminRequests() {
     });
 
   const loadRendezVous = () =>
-    getRendezVous(token)
+    getUserRendezVous(token)
       .then(({ data: reservations }) => {
         setReservations(reservations);
       })

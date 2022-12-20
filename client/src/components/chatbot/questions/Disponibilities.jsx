@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { createRendezVous, getRendezVous } from "@api/rendezVous";
+import { createRendezVous, getAllRendezVous } from "@api/rendezVous";
 import { useAlert } from "@hooks/alert";
 import { useAuth } from "@hooks/auth";
 
@@ -43,7 +43,7 @@ export default function Disponibilities({ typeLabel, typeId, onAnswer }) {
   };
 
   useEffect(() => {
-    getRendezVous(token, typeId)
+    getAllRendezVous(typeId)
       .then(({ data: rendezVous }) => {
         setChoices(getWeekAvailabilities(rendezVous));
       })
