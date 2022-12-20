@@ -40,7 +40,7 @@ export default function ChatBot() {
   }
 
   return (
-    <div className="w-25 mx-auto">
+    <div className="w-50 mx-auto">
       <h1 className="mb-5">Chatbot</h1>
       <div className="mb-5">
         <ChatHistory history={_history} />

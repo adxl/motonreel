@@ -82,7 +82,7 @@ function ChatConversation({ messages }) {
             ) : (
               <div className="d-flex justify-content-start align-items-end">
                 <Avatar seed={senderUser.id} />
-                <div className="d-flex flex-column">
+                <div className="d-flex flex-column align-items-start">
                   <span className="text-muted">{senderUser.name}</span>
                   <Badge pill bg="secondary" className="p-2">
                     {content}

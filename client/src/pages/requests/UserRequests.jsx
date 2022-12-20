@@ -80,86 +80,79 @@ export default function UserRequests() {
     <Container>
       <Row>
         <Col>
-          <Card>
-            <Card.Body>
-              <h2>Contacter un conseiller</h2>
-              {_advisors.length ? (
-                <Table striped bordered hover>
-                  <thead>
-                    <tr>
-                      <th>Nom</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {_advisors.map((advisor) => (
-                      <tr key={advisor.id}>
-                        <td style={tdStyle}>{advisor.name}</td>
-                        <td style={tdStyle}>Disponible</td>
-                        <td style={tdStyle}>
-                          <Button
-                            className="text-nowrap"
-                            onClick={() => {
-                              handleRequest(advisor.id);
-                            }}
-                          >
-                            Envoyer une demande
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
-              ) : (
-                <p>Aucun conseiller disponible</p>
-              )}
-              <div className="d-flex align-items-center">
-                <p className="m-0">Pas de conseiller disponible ?</p>
-                &nbsp;
-                <Link to="/chatbot">Consulter le ChatBot</Link>
-              </div>
-            </Card.Body>
-          </Card>
+          <h2 className="text-start">Contacter un conseiller</h2>
+          {_advisors.length ? (
+            <Table striped bordered hover>
+              <thead>
+                <tr>
+                  <th>Nom</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {_advisors.map((advisor) => (
+                  <tr key={advisor.id}>
+                    <td style={tdStyle}>{advisor.name}</td>
+                    <td style={tdStyle}>Disponible</td>
+                    <td style={tdStyle}>
+                      <Button
+                        className="text-nowrap"
+                        onClick={() => {
+                          handleRequest(advisor.id);
+                        }}
+                      >
+                        Envoyer une demande
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          ) : (
+            <p>Aucun conseiller disponible</p>
+          )}
+          <div className="d-flex align-items-center">
+            <p className="m-0">Pas de conseiller disponible ?</p>
+            &nbsp;
+            <Link to="/chatbot">Consulter le ChatBot</Link>
+          </div>
         </Col>
 
         <Col>
-          <Card>
-            <Card.Body>
-              <h2>Mes demandes</h2>
-              {_requests.length > 0 && (
-                <Table striped bordered hover>
-                  <thead>
-                    <tr>
-                      <th>Nom</th>
-                      <th>Status</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {_requests.map((request) => (
-                      <tr key={request.id}>
-                        <td style={tdStyle}>{request.advisorUser.name}</td>
-                        <td style={tdStyle}>{request.requestStatus.name}</td>
-                        {request.status ===
-                          "23fb3b0e-c5bd-4dc3-b186-60be4987fd7c" && (
-                          <td style={tdStyle}>
-                            <Link to={`/requests/${request.id}`}>
-                              Accéder au tchat
-                            </Link>
-                          </td>
-                        )}
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
-              )}
-            </Card.Body>
-          </Card>
+          <h2 className="text-start">Mes demandes</h2>
+          {_requests.length > 0 && (
+            <Table striped bordered hover>
+              <thead>
+                <tr>
+                  <th>Nom</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {_requests.map((request) => (
+                  <tr key={request.id}>
+                    <td style={tdStyle}>{request.advisorUser.name}</td>
+                    <td style={tdStyle}>{request.requestStatus.name}</td>
+                    <td style={tdStyle}>
+                      {request.status ===
+                        "23fb3b0e-c5bd-4dc3-b186-60be4987fd7c" && (
+                        <Link to={`/requests/${request.id}`}>
+                          Accéder au tchat
+                        </Link>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          )}
         </Col>
       </Row>
       <Row className="mt-5">
         <Col>
-          <h2>Mes prochains rendez-vous</h2>
+          <h2 className="text-start">Mes prochains rendez-vous</h2>
 
           {_reservations.length ? (
             <Table striped bordered hover>

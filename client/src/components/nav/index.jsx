@@ -30,7 +30,10 @@ export default React.memo(function Header() {
     >
       <Container fluid>
         <LinkContainer to="/">
-          <Navbar.Brand>Motonréel</Navbar.Brand>
+          <Navbar.Brand>
+            <i className="fa-solid fa-motorcycle">&nbsp;</i>
+            <span>Motonréel</span>
+          </Navbar.Brand>
         </LinkContainer>
         <Navbar.Toggle />
         <Navbar.Collapse className="pt-0">

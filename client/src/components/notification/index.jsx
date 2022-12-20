@@ -2,6 +2,7 @@ import React from "react";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Form from "react-bootstrap/Form";
+import InputGroup from "react-bootstrap/InputGroup";
 
 import { sendNotification } from "@api/notifications";
 import { useAuth } from "@hooks/auth";
@@ -9,6 +10,15 @@ import { useAuth } from "@hooks/auth";
 export default function Notification() {
   const { token } = useAuth();
   const [_message, setMessage] = React.useState("");
+
+  const inputRef = React.useRef();
+
+  React.useEffect(() => {
+    document.addEventListener("keyup", focusInput);
+    return () => {
+      document.removeEventListener("keyup", focusInput);
+    };
+  }, []);
 
   function handleMessageChange(event) {
     setMessage(event.target.value);
@@ -21,17 +31,27 @@ export default function Notification() {
     });
   }
 
+  function focusInput(e) {
+    if (e.key === "/") {
+      inputRef.current.focus();
+    }
+  }
+
   return (
-    <div className="fixed-bottom p-2" style={{ width: 500 }}>
+    <div className="fixed-bottom p-2" style={{ width: 800 }}>
       <Card className="p-1">
         <Card.Body>
           <Form onSubmit={handleSubmit} className="d-flex align-items-center">
-            <Form.Control
-              type="text"
-              placeholder="/all : Message aux utilisateurs"
-              value={_message}
-              onChange={handleMessageChange}
-            />
+            <InputGroup>
+              <InputGroup.Text>/all</InputGroup.Text>
+              <Form.Control
+                type="text"
+                placeholder="Tapez '/' pour envoyer un message général"
+                value={_message}
+                ref={inputRef}
+                onChange={handleMessageChange}
+              />
+            </InputGroup>
             <Button type="submit" variant="primary">
               Envoyer
             </Button>

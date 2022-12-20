@@ -26,15 +26,13 @@ export default function TextQuestion({ title, onAnswer }) {
     <Question title={title}>
       <Form onSubmit={handleAnswer}>
         <div className="d-flex align-items-center">
-          <Form.Group>
-            <Form.Control
-              type="text"
-              placeholder="Entrez votre réponse"
-              value={_input}
-              ref={inputRef}
-              onChange={handleInputChange}
-            />
-          </Form.Group>
+          <Form.Control
+            type="text"
+            placeholder="Entrez votre réponse"
+            value={_input}
+            ref={inputRef}
+            onChange={handleInputChange}
+          />
           <Button type="submit" variant="primary">
             Envoyer
           </Button>

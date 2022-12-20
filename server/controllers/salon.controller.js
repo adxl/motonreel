@@ -26,7 +26,7 @@ exports.create = async (req, res) => {
 
   await Salon.create(salon)
     .then((data) => {
-      res.status(201).json({ salon: data, message: `Salon ${name} crée !` });
+      res.status(201).json({ salon: data, message: `Salon ${name} créé !` });
     })
     .catch((err) => {
       res.status(500).json({
@@ -98,7 +98,7 @@ exports.update = async (req, res) => {
     .then((num) => {
       if (num == 1) {
         res.status(200).json({
-          message: `Le salon a bien été mis à jour avec succès.`,
+          message: `Le salon a bien été mis à jour`,
         });
       } else {
         res.status(500).json({
