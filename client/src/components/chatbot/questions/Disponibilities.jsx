@@ -6,7 +6,7 @@ import { useAuth } from "@hooks/auth";
 
 import ChoiceQuestion from "../ChoiceQuestion";
 
-import { END_DISPONIBILITIES } from ".";
+import { END_DISPONIBILITIES, NO_DISPONIBILITIES } from ".";
 
 export default function Disponibilities({ typeLabel, typeId, onAnswer }) {
   const { token } = useAuth();
@@ -14,9 +14,7 @@ export default function Disponibilities({ typeLabel, typeId, onAnswer }) {
 
   const [_choices, setChoices] = useState([]);
 
-  const [_title, setTitle] = useState(
-    "Veuillez choisir un créneau pour un rendez-vous " + typeLabel
-  );
+  const title = "Veuillez choisir un créneau pour un rendez-vous " + typeLabel;
 
   const getWeekAvailabilities = (rendezVous) => {
     const rendezVousDates = rendezVous.map((rdv) =>
@@ -60,8 +58,11 @@ export default function Disponibilities({ typeLabel, typeId, onAnswer }) {
     }
 
     if (!hasRdvDates) {
-      setTitle("Aucune date disponible pour le moment");
-      return [];
+      return onAnswer(
+        NO_DISPONIBILITIES,
+        title,
+        new Date().toLocaleDateString("fr")
+      );
     }
 
     return week;
@@ -89,7 +90,7 @@ export default function Disponibilities({ typeLabel, typeId, onAnswer }) {
       .then(({ data: data }) => {
         return onAnswer(
           END_DISPONIBILITIES,
-          _title,
+          title,
           new Date(data.date).toLocaleDateString("fr")
         );
       })
@@ -99,6 +100,6 @@ export default function Disponibilities({ typeLabel, typeId, onAnswer }) {
   }
 
   return (
-    <ChoiceQuestion title={_title} onAnswer={handleAnswer} choices={_choices} />
+    <ChoiceQuestion title={title} onAnswer={handleAnswer} choices={_choices} />
   );
 }
