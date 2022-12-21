@@ -14,7 +14,9 @@ export default function Disponibilities({ typeLabel, typeId, onAnswer }) {
 
   const [_choices, setChoices] = useState([]);
 
-  const title = "Veuillez choisir un créneau pour un rendez-vous " + typeLabel;
+  const [_title, setTitle] = useState(
+    "Veuillez choisir un créneau pour un rendez-vous " + typeLabel
+  );
 
   const getWeekAvailabilities = (rendezVous) => {
     const rendezVousDates = rendezVous.map((rdv) =>
@@ -24,20 +26,51 @@ export default function Disponibilities({ typeLabel, typeId, onAnswer }) {
     const today = new Date();
     const firstDayDate = today.getDate() - today.getDay() + 1;
 
-    const week = Array(7)
-      .fill()
-      .map((_, i) => {
-        const _today = new Date(today);
-        const day = new Date(_today.setDate(firstDayDate + i));
+    let hasRdvDates = false;
+    let count = 0;
+    var week = [];
 
-        return {
-          key: i,
-          label: day.toDateString(),
-          value: day,
-          disabled:
-            day <= today || rendezVousDates.includes(day.toDateString()),
-        };
-      });
+    console.log(rendezVousDates);
+
+    while (!hasRdvDates && count <= 1) {
+      week = Array(7)
+        .fill()
+        .map((_, i) => {
+          const _today = new Date(today);
+          const day =
+            count < 1
+              ? new Date(_today.setDate(firstDayDate + i))
+              : new Date(_today.setDate(firstDayDate + 7 + i));
+
+          console.log(day.toDateString());
+
+          if (
+            day > today &&
+            (!today || !rendezVousDates.includes(day.toDateString()))
+          ) {
+            console.log(
+              day.toDateString(),
+              rendezVousDates.includes(day.toDateString())
+            );
+            hasRdvDates = true;
+          }
+
+          return {
+            key: i,
+            label: day.toDateString(),
+            value: day,
+            disabled:
+              day <= today || rendezVousDates.includes(day.toDateString()),
+          };
+        });
+
+      count++;
+    }
+
+    if (!hasRdvDates) {
+      setTitle("Aucune date disponible pour le moment");
+      return [];
+    }
 
     return week;
   };
@@ -64,7 +97,7 @@ export default function Disponibilities({ typeLabel, typeId, onAnswer }) {
       .then(({ data: data }) => {
         return onAnswer(
           END_DISPONIBILITIES,
-          title,
+          _title,
           new Date(data.date).toLocaleDateString("fr")
         );
       })
@@ -74,6 +107,6 @@ export default function Disponibilities({ typeLabel, typeId, onAnswer }) {
   }
 
   return (
-    <ChoiceQuestion title={title} onAnswer={handleAnswer} choices={_choices} />
+    <ChoiceQuestion title={_title} onAnswer={handleAnswer} choices={_choices} />
   );
 }
