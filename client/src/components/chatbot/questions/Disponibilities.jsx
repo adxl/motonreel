@@ -30,8 +30,6 @@ export default function Disponibilities({ typeLabel, typeId, onAnswer }) {
     let count = 0;
     var week = [];
 
-    console.log(rendezVousDates);
-
     while (!hasRdvDates && count <= 1) {
       week = Array(7)
         .fill()
@@ -42,16 +40,10 @@ export default function Disponibilities({ typeLabel, typeId, onAnswer }) {
               ? new Date(_today.setDate(firstDayDate + i))
               : new Date(_today.setDate(firstDayDate + 7 + i));
 
-          console.log(day.toDateString());
-
           if (
             day > today &&
             (!today || !rendezVousDates.includes(day.toDateString()))
           ) {
-            console.log(
-              day.toDateString(),
-              rendezVousDates.includes(day.toDateString())
-            );
             hasRdvDates = true;
           }
 
