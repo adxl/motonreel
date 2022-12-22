@@ -6,7 +6,7 @@ import { useAuth } from "@hooks/auth";
 
 import ChoiceQuestion from "../ChoiceQuestion";
 
-import { END_DISPONIBILITIES } from ".";
+import { END_DISPONIBILITIES, NO_DISPONIBILITIES } from ".";
 
 export default function Disponibilities({ typeLabel, typeId, onAnswer }) {
   const { token } = useAuth();
@@ -24,20 +24,46 @@ export default function Disponibilities({ typeLabel, typeId, onAnswer }) {
     const today = new Date();
     const firstDayDate = today.getDate() - today.getDay() + 1;
 
-    const week = Array(7)
-      .fill()
-      .map((_, i) => {
-        const _today = new Date(today);
-        const day = new Date(_today.setDate(firstDayDate + i));
+    let hasRdvDates = false;
+    let count = 0;
+    var week = [];
 
-        return {
-          key: i,
-          label: day.toDateString(),
-          value: day,
-          disabled:
-            day <= today || rendezVousDates.includes(day.toDateString()),
-        };
-      });
+    while (!hasRdvDates && count <= 1) {
+      week = Array(7)
+        .fill()
+        .map((_, i) => {
+          const _today = new Date(today);
+          const day =
+            count < 1
+              ? new Date(_today.setDate(firstDayDate + i))
+              : new Date(_today.setDate(firstDayDate + 7 + i));
+
+          if (
+            day > today &&
+            (!today || !rendezVousDates.includes(day.toDateString()))
+          ) {
+            hasRdvDates = true;
+          }
+
+          return {
+            key: i,
+            label: day.toDateString(),
+            value: day,
+            disabled:
+              day <= today || rendezVousDates.includes(day.toDateString()),
+          };
+        });
+
+      count++;
+    }
+
+    if (!hasRdvDates) {
+      return onAnswer(
+        NO_DISPONIBILITIES,
+        title,
+        new Date().toLocaleDateString("fr")
+      );
+    }
 
     return week;
   };
