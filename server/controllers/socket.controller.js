@@ -5,6 +5,7 @@ const {
   message: Message,
   salonMessage: SalonMessage,
   commRequestMessage: CommRequestMessage,
+  privateChatMessage: PrivateChatMessage,
 } = db;
 
 const { getUser } = require("../middlewares/auth");
@@ -50,9 +51,10 @@ module.exports = (server) => {
       socket.on("message", (message) => {
         const { room, content } = message;
         Message.create({ content, sender: userId }).then((msg) => {
-          SalonMessage.create({ SalonId: room, MessageId: msg.id });
-          socket.to(room).emit("message");
-          console.log(`--- ${userName} says : "${content}" in room ${room}`);
+          SalonMessage.create({ SalonId: room, MessageId: msg.id }).then(() => {
+            socket.to(room).emit("message");
+            console.log(`--- ${userName} says : "${content}" in room ${room}`);
+          });
         });
       });
 
@@ -76,6 +78,31 @@ module.exports = (server) => {
         const { room, content } = message;
         Message.create({ content, sender: userId }).then((msg) => {
           CommRequestMessage.create({ CommRequestId: room, MessageId: msg.id });
+          socket.to(room).emit("message");
+          console.log(`--- ${userName} says : "${content}" in room ${room}`);
+        });
+      });
+
+      socket.on("disconnect", () =>
+        console.log(`<<< ${userName} disconnected`)
+      );
+    });
+
+  io.of(DOMAINS.PRIVATE)
+    .use(userFetcher)
+    .on("connection", (socket) => {
+      const { user } = socket;
+      const { name: userName, id: userId } = user;
+
+      socket.on("join", ({ roomId }) => {
+        socket.join(roomId);
+        socket.emit("joined");
+      });
+
+      socket.on("message", (message) => {
+        const { room, content } = message;
+        Message.create({ content, sender: userId }).then((msg) => {
+          PrivateChatMessage.create({ PrivateChatId: room, MessageId: msg.id });
           socket.to(room).emit("message");
           console.log(`--- ${userName} says : "${content}" in room ${room}`);
         });

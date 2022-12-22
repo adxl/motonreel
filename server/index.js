@@ -51,6 +51,8 @@ app.post("/users/addSalon", auth, users.addSalon);
 
 app.post("/users/removeSalon", auth, users.removeSalon);
 
+app.get("/users", auth, users.findAll);
+
 /* RendezVous Routes */
 
 const rendezVous = require("./controllers/rendezVous.controller");
@@ -71,6 +73,13 @@ app.get("/commRequests/:id", auth, commRequest.findOne);
 app.post("/commRequests/create", auth, commRequest.create);
 
 app.patch("/commRequests/:id", auth, commRequest.update);
+
+/* privateChats Routes */
+
+const privateChat = require("./controllers/privateChat.controller");
+
+app.get("/privateChat/:id", auth, privateChat.findOne);
+app.post("/privateChat/create", auth, privateChat.create);
 
 /* Socket */
 const initMessengerSocket = require("./controllers/socket.controller");

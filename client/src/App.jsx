@@ -88,7 +88,7 @@ export default function App() {
                 />
                 <Route
                   exact
-                  path="/chat/:conversationId"
+                  path="/chat/:secUserId"
                   element={<ProtectedRoute el={ConversationDetails} />}
                 />
 

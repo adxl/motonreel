@@ -21,10 +21,12 @@ export default function Forum() {
   const { alertError, alertSuccess } = useAlert();
 
   useEffect(() => {
-    getSalons(token).then((salons) => {
-      setSalons(salons.data);
-      setIsLoaded(true);
-    });
+    getSalons(token)
+      .then((salons) => {
+        setSalons(salons.data);
+        setIsLoaded(true);
+      })
+      .catch((err) => console.log(err));
   }, [_salons]);
 
   function handleDeleteConfirm(id, hideModal) {

@@ -60,7 +60,7 @@ exports.findAll = async (req, res) => {
         {
           model: db.CommRequestStatus,
           as: "requestStatus",
-          attributes: ["name"],
+          attributes: ["name", "id"],
         },
       ],
     }).catch((err) => {

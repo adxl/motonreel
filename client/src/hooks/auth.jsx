@@ -71,7 +71,7 @@ export function AuthProvider({ children }) {
 
   const handleLogout = useCallback(() => {
     setToken(null);
-    eventSource.close();
+    if (eventSource) eventSource.close();
     location.href = "/login";
   }, [eventSource]);
 

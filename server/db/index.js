@@ -16,6 +16,7 @@ const { DataTypes } = Sequelize;
 const connection = new Sequelize(process.env.DATABASE_URL, {
   useNewUrlParser: true,
   dialectOptions,
+  logging: false,
 });
 
 const db = {};
@@ -49,6 +50,20 @@ db.users.hasMany(db.privateChat, {
 db.users.hasMany(db.privateChat, {
   foreignKey: "secUser",
   allowNull: false,
+});
+db.privateChat.belongsTo(db.users, {
+  foreignKey: {
+    name: "firUser",
+    allowNull: false,
+  },
+  as: "firstUser",
+});
+db.privateChat.belongsTo(db.users, {
+  foreignKey: {
+    name: "secUser",
+    allowNull: false,
+  },
+  as: "secondUser",
 });
 
 db.message = require("./models/Message.model")(connection, DataTypes);
